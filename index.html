@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S&H Event | Automotive Experience</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js for interactive modals and logic -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+        }
+        .heading-font { font-family: 'Orbitron', sans-serif; }
+
+        .car-hero-new {
+            position: relative;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+        }
+        .car-hero-new::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.2)),
+            var(--hero-bg, url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200'));
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            filter: saturate(1.2) brightness(1.1);
+        }
+
+        .netflix-card {
+            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            cursor: pointer;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+        }
+        .netflix-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.3);
+        }
+        .netflix-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 40%, transparent 80%);
+        }
+
+        .section-line {
+            transition: width 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .group-header:hover .section-line {
+            width: 60px;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="text-slate-900" 
+      x-data="{ 
+        merchOpen: false, 
+        galleryOpen: false, 
+        loginOpen: false, 
+        registerOpen: false,
+        adminOpen: false,
+        isLoggedIn: false,
+        isAdmin: false,
+        currentUser: '',
+        
+        // CMS Data
+        layoutData: {
+            heroBg: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200',
+            eventTitle: 'Proton X Perodua Day',
+            eventImg: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=1200'
+        },
+        merchandise: [],
+        gallery: [],
+
+        // Admin Master List
+        admins: [
+            { email: 'naqibimannn@gmail.com', pass: 'Abc0581678!', name: 'Naqib' },
+            { email: 'nrain.nzri@gmail.com', pass: 'Syamim97#', name: 'Ain' }
+        ],
+
+        // Form Data
+        regName: '', regEmail: '', regPass: '',
+        logEmail: '', logPass: '',
+        rememberMe: false,
+
+        init() {
+            const session = JSON.parse(localStorage.getItem('sh_session'));
+            const savedEmail = localStorage.getItem('sh_remember_email');
+            const savedPass = localStorage.getItem('sh_remember_pass');
+            
+            if (session) {
+                this.isLoggedIn = true;
+                this.currentUser = session.name;
+                this.isAdmin = session.isAdmin;
+            }
+            
+            if (savedEmail && savedPass) {
+                this.logEmail = savedEmail;
+                this.logPass = savedPass;
+                this.rememberMe = true;
+            }
+
+            const savedLayout = JSON.parse(localStorage.getItem('sh_layout'));
+            if (savedLayout) this.layoutData = savedLayout;
+
+            const savedMerch = JSON.parse(localStorage.getItem('sh_merch'));
+            if (savedMerch) this.merchandise = savedMerch;
+
+            const savedGallery = JSON.parse(localStorage.getItem('sh_gallery'));
+            if (savedGallery) this.gallery = savedGallery;
+        },
+
+        updateLayout() {
+            localStorage.setItem('sh_layout', JSON.stringify(this.layoutData));
+            alert('Layout Updated Successfully!');
+        },
+
+        addMerch(name, price, url) {
+            if(!name || !url) return alert('Please fill in product details');
+            this.merchandise.push({ name, price, url });
+            localStorage.setItem('sh_merch', JSON.stringify(this.merchandise));
+        },
+
+        deleteMerch(index) {
+            this.merchandise.splice(index, 1);
+            localStorage.setItem('sh_merch', JSON.stringify(this.merchandise));
+        },
+
+        addGallery(url) {
+            if(!url) return alert('Please enter Image URL');
+            this.gallery.push(url);
+            localStorage.setItem('sh_gallery', JSON.stringify(this.gallery));
+        },
+
+        deleteGallery(index) {
+            this.gallery.splice(index, 1);
+            localStorage.setItem('sh_gallery', JSON.stringify(this.gallery));
+        },
+
+        registerUser() {
+            if(!this.regName || !this.regEmail || !this.regPass) return alert('Please fill in all fields.');
+            localStorage.setItem('user_' + this.regEmail, JSON.stringify({ name: this.regName, pass: this.regPass }));
+            alert('Registration Successful! Please log in.');
+            this.registerOpen = false;
+            this.loginOpen = true;
+        },
+
+        loginUser() {
+            let sessionData = null;
+            const adminMatch = this.admins.find(a => a.email === this.logEmail && a.pass === this.logPass);
+
+            if(adminMatch) {
+                let choice = confirm('Log in as ADMIN? (Cancel for User View)');
+                sessionData = { name: adminMatch.name, isAdmin: choice, email: this.logEmail };
+            } else {
+                let user = JSON.parse(localStorage.getItem('user_' + this.logEmail));
+                if(user && user.pass === this.logPass) {
+                    sessionData = { name: user.name, isAdmin: false, email: this.logEmail };
+                }
+            }
+
+            if (sessionData) {
+                this.isLoggedIn = true;
+                this.currentUser = sessionData.name;
+                this.isAdmin = sessionData.isAdmin;
+                this.loginOpen = false;
+                localStorage.setItem('sh_session', JSON.stringify(sessionData));
+                if (this.rememberMe) {
+                    localStorage.setItem('sh_remember_email', this.logEmail);
+                    localStorage.setItem('sh_remember_pass', this.logPass);
+                } else {
+                    localStorage.removeItem('sh_remember_email');
+                    localStorage.removeItem('sh_remember_pass');
+                }
+                alert('Welcome, ' + (this.isAdmin ? 'Admin ' : '') + this.currentUser + '!');
+            } else {
+                alert('Invalid Email or Password!');
+            }
+        },
+
+        logout() {
+            this.isLoggedIn = false;
+            this.isAdmin = false;
+            this.currentUser = '';
+            this.adminOpen = false;
+            localStorage.removeItem('sh_session');
+        },
+
+        getAllUsers() {
+            let users = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i);
+                if (key.startsWith('user_')) {
+                    try {
+                        let val = JSON.parse(localStorage.getItem(key));
+                        users.push({ email: key.replace('user_', ''), name: val.name, pass: val.pass });
+                    } catch(e) {}
+                }
+            }
+            return users;
+        },
+
+        deleteUser(email) {
+            if(confirm('Delete user ' + email + '?')) {
+                localStorage.removeItem('user_' + email);
+            }
+        }
+      }">
+
+<!-- Navbar -->
+<nav class="fixed w-[92%] md:w-[85%] left-1/2 -translate-x-1/2 top-6 z-50 flex justify-between items-center px-8 py-4 bg-white/40 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] rounded-2xl transition-all duration-300">
+    <div class="text-xl font-black tracking-tighter heading-font group cursor-pointer" onclick="window.location.reload()">
+        <span class="text-red-600">S&H</span>
+        <span class="text-slate-900">EVENT</span>
+    </div>
+
+    <div class="hidden lg:flex items-center space-x-10 text-[11px] uppercase tracking-[0.2em] font-black text-slate-700">
+        <a href="#" class="hover:text-red-600 transition-colors">About Us</a>
+        <button @click="merchOpen = true" class="hover:text-red-600 transition-colors uppercase cursor-pointer">Merchandise</button>
+        <button @click="galleryOpen = true" class="hover:text-red-600 transition-colors uppercase cursor-pointer">Gallery</button>
+        <a href="#" class="hover:text-red-600 transition-colors">Event</a>
+    </div>
+    
+    <div class="flex items-center gap-4">
+        <template x-if="!isLoggedIn">
+            <button @click="loginOpen = true" class="text-[10px] font-black text-white bg-slate-950 px-8 py-2.5 rounded-xl hover:bg-red-600 hover:shadow-lg hover:shadow-red-200 transition-all duration-300 transform active:scale-95">
+                LOG IN
+            </button>
+        </template>
+        <template x-if="isLoggedIn">
+            <div class="flex items-center gap-3">
+                <span class="text-[10px] font-bold text-slate-600 uppercase" x-text="(isAdmin ? '[ADMIN] ' : '') + 'Hi, ' + currentUser"></span>
+                <button @click="logout()" class="text-[10px] font-black text-red-600 border border-red-600 px-4 py-2 rounded-lg hover:bg-red-600 hover:text-white transition-all">LOGOUT</button>
+            </div>
+        </template>
+    </div>
+</nav>
+
+<!-- ADMIN FLOATING BUTTON -->
+<div x-show="isLoggedIn && isAdmin" class="fixed bottom-6 right-6 z-[100]" x-cloak>
+    <button @click="adminOpen = !adminOpen" class="w-14 h-14 bg-red-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform">
+        <svg x-show="!adminOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        <span x-show="adminOpen" class="font-bold">✕</span>
+    </button>
+</div>
+
+<!-- ADMIN DASHBOARD OVERLAY -->
+<div x-show="adminOpen" class="fixed inset-0 z-[90] flex items-center justify-center p-6" x-cloak>
+    <div @click="adminOpen = false" class="absolute inset-0 bg-slate-950/80 backdrop-blur-lg"></div>
+    <div class="relative bg-white w-full max-w-4xl max-h-[80vh] rounded-[2rem] overflow-hidden flex flex-col shadow-2xl">
+        <div class="p-8 border-b flex justify-between items-center bg-slate-50">
+            <div>
+                <h2 class="heading-font text-2xl font-black italic">ADMIN CONTROL PANEL</h2>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Analytics & Content Management</p>
+            </div>
+            <button @click="isAdmin = false; adminOpen = false" class="px-4 py-2 bg-slate-900 text-white text-[10px] font-bold rounded-lg hover:bg-red-600 transition-colors">SWITCH TO USER VIEW</button>
+        </div>
+        <div class="p-8 overflow-y-auto">
+            <!-- ADMIN STATS -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-red-50 p-6 rounded-2xl border border-red-100">
+                    <span class="text-[10px] font-bold text-red-600 uppercase tracking-widest">Registered Users</span>
+                    <h3 class="text-3xl font-black" x-text="getAllUsers().length"></h3>
+                </div>
+                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total System Admins</span>
+                    <h3 class="text-3xl font-black text-white" x-text="admins.length"></h3>
+                </div>
+            </div>
+
+            <!-- USER MANAGEMENT TABLE -->
+            <h3 class="heading-font text-lg font-black mb-4">User Management</h3>
+            <table class="w-full text-left mb-12">
+                <thead>
+                    <tr class="text-[10px] font-black uppercase text-slate-400 border-b">
+                        <th class="pb-4">Name</th>
+                        <th class="pb-4">Email</th>
+                        <th class="pb-4">Password</th>
+                        <th class="pb-4 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm">
+                    <template x-for="user in getAllUsers()" :key="user.email">
+                        <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                            <td class="py-4 font-bold" x-text="user.name"></td>
+                            <td class="py-4 text-slate-500" x-text="user.email"></td>
+                            <td class="py-4 font-mono text-red-400" x-text="user.pass"></td>
+                            <td class="py-4 text-right">
+                                <button @click="deleteUser(user.email)" class="text-red-600 font-bold text-[10px] hover:underline uppercase">Delete</button>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+
+            <!-- WEBSITE CONTENT MANAGER (CMS) -->
+            <div class="border-t pt-8">
+                <h3 class="heading-font text-lg font-black mb-6 italic text-red-600">Website Content Manager</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Edit Hero & Event -->
+                    <div class="bg-slate-50 p-6 rounded-2xl space-y-4 border border-slate-100">
+                        <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-400">Hero & Spotlight</h4>
+                        <div>
+                            <label class="text-[10px] font-bold block mb-1">Hero Background URL</label>
+                            <input type="text" x-model="layoutData.heroBg" class="w-full p-2 text-xs border rounded-lg focus:border-red-600 outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold block mb-1">Spotlight Image URL</label>
+                            <input type="text" x-model="layoutData.eventImg" class="w-full p-2 text-xs border rounded-lg focus:border-red-600 outline-none">
+                        </div>
+                        <button @click="updateLayout()" class="w-full py-3 bg-red-600 text-white text-[10px] font-black rounded-lg hover:bg-slate-900 transition-colors uppercase">Save Changes</button>
+                    </div>
+
+                    <!-- Add Gallery Image -->
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                        <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Add Gallery Photo</h4>
+                        <div class="flex gap-2">
+                            <input type="text" id="newGalUrl" placeholder="Image URL" class="flex-1 p-2 text-xs border rounded-lg focus:border-red-600 outline-none">
+                            <button @click="addGallery(document.getElementById('newGalUrl').value); document.getElementById('newGalUrl').value=''" class="px-4 py-2 bg-slate-900 text-white text-[10px] font-black rounded-lg">ADD</button>
+                        </div>
+                        <div class="mt-4 flex flex-wrap gap-2 overflow-y-auto max-h-32 p-2 bg-white rounded-lg border">
+                            <template x-for="(img, index) in gallery" :key="index">
+                                <div class="relative w-12 h-12 flex-shrink-0">
+                                    <img :src="img" class="w-full h-full object-cover rounded shadow-sm">
+                                    <button @click="deleteGallery(index)" class="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-4 h-4 text-[8px] flex items-center justify-center">✕</button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Add Merchandise -->
+                <div class="mt-8 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                    <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Merchandise Manager</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <input type="text" id="mName" placeholder="Product Name" class="p-2 text-xs border rounded-lg outline-none">
+                        <input type="text" id="mPrice" placeholder="Price (USD/RM)" class="p-2 text-xs border rounded-lg outline-none">
+                        <input type="text" id="mUrl" placeholder="Image URL" class="p-2 text-xs border rounded-lg outline-none">
+                        <button @click="addMerch(document.getElementById('mName').value, document.getElementById('mPrice').value, document.getElementById('mUrl').value); document.getElementById('mName').value=''; document.getElementById('mPrice').value=''; document.getElementById('mUrl').value=''" class="bg-red-600 text-white text-[10px] font-black rounded-lg uppercase">Add Product</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- LOGIN OVERLAY -->
+<div x-show="loginOpen" 
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     class="fixed inset-0 z-[70] flex items-center justify-center p-6" x-cloak>
+    
+    <div @click="loginOpen = false" class="absolute inset-0 bg-slate-950/60 backdrop-blur-md"></div>
+
+    <div class="relative bg-white w-full max-w-md overflow-hidden rounded-[2rem] shadow-2xl border border-white flex flex-col p-8 md:p-12"
+         x-show="loginOpen"
+         x-transition:enter="transition ease-out duration-500 transform"
+         x-transition:enter-start="scale-90 translate-y-10"
+         x-transition:enter-end="scale-100 translate-y-0">
+        
+        <div class="text-center mb-8">
+            <h3 class="text-red-600 text-[10px] font-black tracking-[.4em] uppercase mb-2">Member Access</h3>
+            <h2 class="heading-font text-3xl font-black italic tracking-tighter">WELCOME BACK</h2>
+        </div>
+
+        <form class="space-y-4" @submit.prevent="loginUser()">
+            <div>
+                <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Email Address</label>
+                <input type="email" x-model="logEmail" placeholder="driver@shevent.com" class="w-full mt-1 px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:border-red-600 transition-colors font-medium">
+            </div>
+            <div>
+                <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Password</label>
+                <input type="password" x-model="logPass" placeholder="••••••••" class="w-full mt-1 px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:border-red-600 transition-colors font-medium">
+            </div>
+
+            <div class="flex items-center justify-between px-2 py-2">
+                <label class="flex items-center gap-2 cursor-pointer group">
+                    <input type="checkbox" x-model="rememberMe" class="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-900 transition-colors">Remember Me</span>
+                </label>
+            </div>
+            
+            <button class="w-full bg-slate-950 text-white font-black py-4 rounded-2xl mt-2 hover:bg-red-600 transition-all shadow-lg hover:shadow-red-200 active:scale-[0.98]">
+                AUTHENTICATE
+            </button>
+        </form>
+
+        <p class="text-center mt-8 text-[11px] font-bold text-slate-400 uppercase">
+            Don't have an account? <button @click="loginOpen = false; registerOpen = true" class="text-red-600 hover:underline">Join the club</button>
+        </p>
+
+        <button @click="loginOpen = false" class="absolute top-6 right-6 text-slate-300 hover:text-red-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+    </div>
+</div>
+
+<!-- REGISTER OVERLAY -->
+<div x-show="registerOpen" 
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     class="fixed inset-0 z-[70] flex items-center justify-center p-6" x-cloak>
+    
+    <div @click="registerOpen = false" class="absolute inset-0 bg-slate-950/60 backdrop-blur-md"></div>
+
+    <div class="relative bg-white w-full max-w-md overflow-hidden rounded-[2rem] shadow-2xl border border-white flex flex-col p-8 md:p-12"
+         x-show="registerOpen"
+         x-transition:enter="transition ease-out duration-500 transform"
+         x-transition:enter-start="scale-90 translate-y-10"
+         x-transition:enter-end="scale-100 translate-y-0">
+        
+        <div class="text-center mb-8">
+            <h3 class="text-red-600 text-[10px] font-black tracking-[.4em] uppercase mb-2">New Membership</h3>
+            <h2 class="heading-font text-3xl font-black italic tracking-tighter">START ENGINE</h2>
+        </div>
+
+        <form class="space-y-4" @submit.prevent="registerUser()">
+            <div>
+                <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Nickname</label>
+                <input type="text" x-model="regName" placeholder="e.g. Speed Hunter" class="w-full mt-1 px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:border-red-600 transition-colors font-medium">
+            </div>
+            <div>
+                <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Email Address</label>
+                <input type="email" x-model="regEmail" placeholder="email@example.com" class="w-full mt-1 px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:border-red-600 transition-colors font-medium">
+            </div>
+            <div>
+                <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Password</label>
+                <input type="password" x-model="regPass" placeholder="Min 8 characters" class="w-full mt-1 px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:border-red-600 transition-colors font-medium">
+            </div>
+            
+            <button class="w-full bg-red-600 text-white font-black py-4 rounded-2xl mt-4 hover:bg-slate-950 transition-all shadow-lg hover:shadow-red-200 active:scale-[0.98]">
+                REGISTER NOW
+            </button>
+        </form>
+
+        <p class="text-center mt-8 text-[11px] font-bold text-slate-400 uppercase">
+            Already have an account? <button @click="registerOpen = false; loginOpen = true" class="text-red-600 hover:underline">Log In</button>
+        </p>
+
+        <button @click="registerOpen = false" class="absolute top-6 right-6 text-slate-300 hover:text-red-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+    </div>
+</div>
+
+<!-- MERCHANDISE OVERLAY -->
+<div x-show="merchOpen"
+     class="fixed inset-0 z-[60] flex items-center justify-center p-4 md:p-10" x-cloak>
+    <div @click="merchOpen = false" class="absolute inset-0 bg-white/60 backdrop-blur-md"></div>
+    <div class="relative bg-white w-full max-w-6xl max-h-[85vh] overflow-hidden rounded-[2.5rem] shadow-2xl flex flex-col">
+        <div class="p-10 pb-4 flex justify-between items-center">
+            <div>
+                <h3 class="text-red-600 text-xs font-black tracking-[.4em] uppercase mb-1">Official Gear</h3>
+                <h2 class="heading-font text-4xl font-black italic tracking-tighter">MERCHANDISE</h2>
+            </div>
+            <button @click="merchOpen = false" class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all text-xl">✕</button>
+        </div>
+        <div class="overflow-y-auto p-10 pt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
+            <template x-for="(item, index) in merchandise" :key="index">
+                <div class="group relative">
+                    <div class="aspect-[4/5] bg-slate-100 rounded-3xl overflow-hidden mb-4 relative border border-slate-50">
+                        <img :src="item.url" class="w-full h-full object-cover">
+                        <div class="absolute bottom-4 left-4">
+                            <span class="bg-white/90 backdrop-blur text-slate-900 text-[10px] px-3 py-1.5 rounded-full font-black shadow-sm" x-text="'RM ' + item.price"></span>
+                        </div>
+                        <button x-show="isAdmin" @click="deleteMerch(index)" class="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full text-[8px]">✕</button>
+                    </div>
+                    <h4 class="font-black text-[11px] uppercase tracking-wider" x-text="item.name"></h4>
+                </div>
+            </template>
+
+            <template x-if="merchandise.length === 0">
+                <div class="col-span-full py-20 text-center opacity-20">
+                    <p class="heading-font italic">No items available</p>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+
+<!-- GALLERY OVERLAY -->
+<div x-show="galleryOpen"
+     class="fixed inset-0 z-[60] flex items-center justify-center p-4 md:p-10" x-cloak>
+    <div @click="galleryOpen = false" class="absolute inset-0 bg-slate-950/40 backdrop-blur-md"></div>
+    <div class="relative bg-white w-full max-w-6xl max-h-[85vh] overflow-hidden rounded-[2.5rem] shadow-2xl flex flex-col">
+        <div class="p-10 pb-4 flex justify-between items-center">
+            <div>
+                <h3 class="text-red-600 text-xs font-black tracking-[.4em] uppercase mb-1">Event Highlights</h3>
+                <h2 class="heading-font text-4xl font-black italic tracking-tighter uppercase">GALLERY</h2>
+            </div>
+            <button @click="galleryOpen = false" class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all text-xl">✕</button>
+        </div>
+        <div class="overflow-y-auto p-10 pt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <template x-for="(img, index) in gallery" :key="index">
+                <div class="group cursor-pointer relative">
+                    <div class="aspect-square bg-slate-100 rounded-2xl overflow-hidden relative border border-slate-100 group-hover:border-red-500 transition-all duration-300">
+                        <img :src="img" class="w-full h-full object-cover">
+                    </div>
+                    <button x-show="isAdmin" @click="deleteGallery(index)" class="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full text-[8px]">✕</button>
+                </div>
+            </template>
+
+            <template x-if="gallery.length === 0">
+                <div class="col-span-full py-20 text-center opacity-20">
+                    <p class="heading-font italic">Gallery is empty</p>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+
+<!-- Hero Section -->
+<header class="car-hero-new flex flex-col items-center justify-center text-center px-4" 
+        :style="`--hero-bg: url('${layoutData.heroBg}')`">
+    <div class="z-10 mt-12">
+        <h2 class="text-sm font-bold tracking-[0.3em] uppercase mb-4 text-red-600">The Ultimate Gathering</h2>
+        <h1 class="text-5xl md:text-8xl font-black heading-font mb-6 tracking-tighter italic text-slate-950">
+            <span class="text-red-600">S&H</span> EVENT
+        </h1>
+        <p class="max-w-xl mx-auto text-slate-800 text-sm md:text-base mb-8 font-semibold leading-relaxed">
+            An exclusive automotive community uniting performance style and the spirit of machinery in one prestigious event.
+        </p>
+        <div class="flex justify-center">
+            <button @click="galleryOpen = true" class="bg-slate-900 text-white px-12 py-4 rounded-full font-bold shadow-lg shadow-gray-200 hover:bg-red-600 transition-all duration-300 hover:scale-105">View Gallery</button>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="px-6 md:px-12 -mt-20 relative z-20 pb-24">
+    <section>
+        <div class="group-header flex items-center justify-between mb-8 cursor-default">
+            <div class="flex flex-col">
+                <div class="flex items-center gap-3">
+                    <span class="section-line w-8 h-[2px] bg-red-600 inline-block"></span>
+                    <h3 class="text-sm font-black uppercase tracking-[0.3em] text-red-600">Spotlight</h3>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-black heading-font text-slate-900 mt-1">Upcoming Events</h2>
+            </div>
+            <a href="#" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-red-600 transition-colors flex items-center gap-2">
+                Explore All <span>→</span>
+            </a>
+        </div>
+        
+        <div class="max-w-5xl mx-auto">
+            <div class="netflix-card relative group rounded-3xl overflow-hidden aspect-video md:aspect-[21/9]">
+                <img :src="layoutData.eventImg"
+                     class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
+                     alt="Event Banner">
+                
+                <div class="netflix-overlay absolute inset-0 flex flex-col justify-center items-center p-8 md:p-12 text-center">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded shadow-lg">NEW</span>
+                        <span class="text-white text-[10px] font-bold uppercase tracking-widest">Collab Series</span>
+                    </div>
+                    
+                    <h4 class="text-white text-4xl md:text-7xl font-black heading-font italic tracking-tighter leading-none">
+                        Proton X <span class="text-red-600">Perodua</span> Day
+                    </h4>
+                    
+                    <div class="flex items-center gap-8 mt-8 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
+                        <div class="flex flex-col">
+                            <span class="text-gray-400 text-[10px] uppercase font-bold tracking-widest">Date</span>
+                            <span class="text-white text-sm font-bold">COMING SOON 2026</span>
+                        </div>
+                        <div class="h-8 w-[1px] bg-gray-600 hidden md:block"></div>
+                        <div class="flex flex-col">
+                            <span class="text-gray-400 text-[10px] uppercase font-bold tracking-widest">Venue</span>
+                            <span class="text-white text-sm font-bold">MAEPS SERDANG</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="bg-gray-50 border-t border-gray-200 py-12 px-6 text-center">
+    <p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase">© 2026 S&H EVENT SERVICES. Engineered for Speed.</p>
+</footer>
+
+</body>
+</html>
