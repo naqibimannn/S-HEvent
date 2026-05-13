@@ -61,11 +61,11 @@
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="text-slate-900" 
-      x-data="{ 
-        merchOpen: false, 
-        galleryOpen: false, 
-        loginOpen: false, 
+<body class="text-slate-900"
+      x-data="{
+        merchOpen: false,
+        galleryOpen: false,
+        loginOpen: false,
         registerOpen: false,
         adminOpen: false,
         isLoggedIn: false,
@@ -93,6 +93,32 @@
         rememberMe: false,
 
         init() {
+            // URL data dari GitHub anda
+            const dataUrl = 'https://raw.githubusercontent.com/naqibimannn/S-HEvent/refs/heads/main/data.json';
+
+            // 1. Tarik data terbaru dari GitHub
+            fetch(dataUrl)
+                .then(res => res.json())
+                .then(data => {
+                    this.layoutData = data.layoutData;
+                    this.merchandise = data.merchandise;
+                    this.gallery = data.gallery;
+                    console.log('Data berjaya di-sync dari GitHub!');
+                })
+                .catch(err => {
+                    console.warn('Gagal tarik data GitHub, guna data tempatan.', err);
+                    // Backup: Kalau internet takde atau link salah, guna data lama dalam browser
+                    const savedLayout = JSON.parse(localStorage.getItem('sh_layout'));
+                    if (savedLayout) this.layoutData = savedLayout;
+                    
+                    const savedMerch = JSON.parse(localStorage.getItem('sh_merch'));
+                    if (savedMerch) this.merchandise = savedMerch;
+
+                    const savedGallery = JSON.parse(localStorage.getItem('sh_gallery'));
+                    if (savedGallery) this.gallery = savedGallery;
+                });
+
+            // 2. Semak sesi log masuk (Login tetap simpan dalam browser masing-masing)
             const session = JSON.parse(localStorage.getItem('sh_session'));
             const savedEmail = localStorage.getItem('sh_remember_email');
             const savedPass = localStorage.getItem('sh_remember_pass');
@@ -108,20 +134,11 @@
                 this.logPass = savedPass;
                 this.rememberMe = true;
             }
-
-            const savedLayout = JSON.parse(localStorage.getItem('sh_layout'));
-            if (savedLayout) this.layoutData = savedLayout;
-
-            const savedMerch = JSON.parse(localStorage.getItem('sh_merch'));
-            if (savedMerch) this.merchandise = savedMerch;
-
-            const savedGallery = JSON.parse(localStorage.getItem('sh_gallery'));
-            if (savedGallery) this.gallery = savedGallery;
         },
 
         updateLayout() {
             localStorage.setItem('sh_layout', JSON.stringify(this.layoutData));
-            alert('Layout Updated Successfully!');
+            alert('Layout Updated Locally! (To update GitHub, you must push the JSON file manually)');
         },
 
         addMerch(name, price, url) {
@@ -317,7 +334,7 @@
                             <label class="text-[10px] font-bold block mb-1">Spotlight Image URL</label>
                             <input type="text" x-model="layoutData.eventImg" class="w-full p-2 text-xs border rounded-lg focus:border-red-600 outline-none">
                         </div>
-                        <button @click="updateLayout()" class="w-full py-3 bg-red-600 text-white text-[10px] font-black rounded-lg hover:bg-slate-900 transition-colors uppercase">Save Changes</button>
+                        <button @click="updateLayout()" class="w-full py-3 bg-red-600 text-white text-[10px] font-black rounded-lg hover:bg-slate-900 transition-colors uppercase">Save Locally</button>
                     </div>
 
                     <!-- Add Gallery Image -->
@@ -343,7 +360,7 @@
                     <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Merchandise Manager</h4>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <input type="text" id="mName" placeholder="Product Name" class="p-2 text-xs border rounded-lg outline-none">
-                        <input type="text" id="mPrice" placeholder="Price (USD/RM)" class="p-2 text-xs border rounded-lg outline-none">
+                        <input type="text" id="mPrice" placeholder="Price (RM)" class="p-2 text-xs border rounded-lg outline-none">
                         <input type="text" id="mUrl" placeholder="Image URL" class="p-2 text-xs border rounded-lg outline-none">
                         <button @click="addMerch(document.getElementById('mName').value, document.getElementById('mPrice').value, document.getElementById('mUrl').value); document.getElementById('mName').value=''; document.getElementById('mPrice').value=''; document.getElementById('mUrl').value=''" class="bg-red-600 text-white text-[10px] font-black rounded-lg uppercase">Add Product</button>
                     </div>
@@ -354,7 +371,7 @@
 </div>
 
 <!-- LOGIN OVERLAY -->
-<div x-show="loginOpen" 
+<div x-show="loginOpen"
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0"
      x-transition:enter-end="opacity-100"
@@ -362,7 +379,7 @@
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
      class="fixed inset-0 z-[70] flex items-center justify-center p-6" x-cloak>
-    
+   
     <div @click="loginOpen = false" class="absolute inset-0 bg-slate-950/60 backdrop-blur-md"></div>
 
     <div class="relative bg-white w-full max-w-md overflow-hidden rounded-[2rem] shadow-2xl border border-white flex flex-col p-8 md:p-12"
@@ -370,7 +387,7 @@
          x-transition:enter="transition ease-out duration-500 transform"
          x-transition:enter-start="scale-90 translate-y-10"
          x-transition:enter-end="scale-100 translate-y-0">
-        
+       
         <div class="text-center mb-8">
             <h3 class="text-red-600 text-[10px] font-black tracking-[.4em] uppercase mb-2">Member Access</h3>
             <h2 class="heading-font text-3xl font-black italic tracking-tighter">WELCOME BACK</h2>
@@ -392,7 +409,7 @@
                     <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-900 transition-colors">Remember Me</span>
                 </label>
             </div>
-            
+           
             <button class="w-full bg-slate-950 text-white font-black py-4 rounded-2xl mt-2 hover:bg-red-600 transition-all shadow-lg hover:shadow-red-200 active:scale-[0.98]">
                 AUTHENTICATE
             </button>
@@ -409,7 +426,7 @@
 </div>
 
 <!-- REGISTER OVERLAY -->
-<div x-show="registerOpen" 
+<div x-show="registerOpen"
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0"
      x-transition:enter-end="opacity-100"
@@ -417,7 +434,7 @@
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
      class="fixed inset-0 z-[70] flex items-center justify-center p-6" x-cloak>
-    
+   
     <div @click="registerOpen = false" class="absolute inset-0 bg-slate-950/60 backdrop-blur-md"></div>
 
     <div class="relative bg-white w-full max-w-md overflow-hidden rounded-[2rem] shadow-2xl border border-white flex flex-col p-8 md:p-12"
@@ -425,7 +442,7 @@
          x-transition:enter="transition ease-out duration-500 transform"
          x-transition:enter-start="scale-90 translate-y-10"
          x-transition:enter-end="scale-100 translate-y-0">
-        
+       
         <div class="text-center mb-8">
             <h3 class="text-red-600 text-[10px] font-black tracking-[.4em] uppercase mb-2">New Membership</h3>
             <h2 class="heading-font text-3xl font-black italic tracking-tighter">START ENGINE</h2>
@@ -444,7 +461,7 @@
                 <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Password</label>
                 <input type="password" x-model="regPass" placeholder="Min 8 characters" class="w-full mt-1 px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:border-red-600 transition-colors font-medium">
             </div>
-            
+           
             <button class="w-full bg-red-600 text-white font-black py-4 rounded-2xl mt-4 hover:bg-slate-950 transition-all shadow-lg hover:shadow-red-200 active:scale-[0.98]">
                 REGISTER NOW
             </button>
@@ -527,7 +544,7 @@
 </div>
 
 <!-- Hero Section -->
-<header class="car-hero-new flex flex-col items-center justify-center text-center px-4" 
+<header class="car-hero-new flex flex-col items-center justify-center text-center px-4"
         :style="`--hero-bg: url('${layoutData.heroBg}')`">
     <div class="z-10 mt-12">
         <h2 class="text-sm font-bold tracking-[0.3em] uppercase mb-4 text-red-600">The Ultimate Gathering</h2>
