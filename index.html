@@ -216,10 +216,29 @@
         ],
 
         // Admin Master List
-        admins: [
-            { email: 'naqibimannn@gmail.com', pass: 'Abc0581678!', name: 'Naqib' },
-            { email: 'nrain.nzri@gmail.com', pass: 'Syamim97#', name: 'Ain' }
-        ],
+        // 1. Kita tambah 'isHead' untuk bezakan Naqib dengan admin lain
+admins: [
+    { email: 'naqibimannn@gmail.com', pass: 'Abc0581678!', name: 'Naqib', isHead: true },
+    { email: 'nrain.nzri@gmail.com', pass: 'Syamim97#', name: 'Ain', isHead: false }
+],
+
+// 2. Tambah fungsi baru ini di bawah list admins tadi
+addAdmin(name, email, pass) {
+    if(this.currentUser !== 'Naqib') {
+        return alert('Hanya Naqib sahaja boleh tambah admin!');
+    }
+    if(!name || !email || !pass) return alert('Sila isi semua info!');
+    
+    this.admins.push({ name, email, pass, isHead: false });
+    alert('Admin ' + name + ' berjaya didaftarkan!');
+},
+
+removeAdmin(email) {
+    if(email === 'naqibimannn@gmail.com') return alert('Akaun Naqib tak boleh dibuang!');
+    if(confirm('Sahkah anda mahu buang admin ini?')) {
+        this.admins = this.admins.filter(a => a.email !== email);
+    }
+},
 
         // Form Data
         regName: '', regEmail: '', regPass: '',
@@ -793,32 +812,60 @@
             </div>
         </div>
 
-        <!-- Jadual Admin (Email & Pass) -->
-        <div class="mb-10">
-            <h3 class="text-xs font-black uppercase tracking-widest text-slate-900 mb-4 flex items-center gap-2">
-                <span class="w-2 h-2 bg-red-600 rounded-full"></span> Admin Access List
-            </h3>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-100">
-                        <tr class="text-[9px] font-black uppercase text-slate-500">
-                            <th class="p-4 rounded-l-xl">Admin Name</th>
-                            <th class="p-4">Email</th>
-                            <th class="p-4 rounded-r-xl">Password</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                        <template x-for="admin in admins" :key="admin.email">
-                            <tr class="border-b border-slate-50">
-                                <td class="p-4 font-black text-red-600 italic" x-text="admin.name"></td>
-                                <td class="p-4 text-slate-600" x-text="admin.email"></td>
-                                <td class="p-4 font-mono text-xs bg-slate-50" x-text="admin.pass"></td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
-            </div>
+<!-- BAHAGIAN PENGURUSAN ADMIN -->
+<div class="mb-10 bg-slate-100 p-6 rounded-[2.5rem] border border-slate-200">
+    <h3 class="text-xs font-black uppercase tracking-widest text-slate-900 mb-6 flex items-center gap-2">
+        <span class="w-2 h-2 bg-red-600 rounded-full"></span> Admin Management
+    </h3>
+    
+    <!-- Borang Tambah Admin: Hanya Naqib nampak -->
+    <template x-if="currentUser === 'Naqib'">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-8">
+            <input type="text" x-ref="newAdminName" placeholder="Nama Admin" class="px-4 py-3 text-xs rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-red-600 outline-none">
+            <input type="email" x-ref="newAdminEmail" placeholder="Email" class="px-4 py-3 text-xs rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-red-600 outline-none">
+            <input type="text" x-ref="newAdminPass" placeholder="Password" class="px-4 py-3 text-xs rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-red-600 outline-none">
+            <button @click="addAdmin($refs.newAdminName.value, $refs.newAdminEmail.value, $refs.newAdminPass.value); $refs.newAdminName.value=''; $refs.newAdminEmail.value=''; $refs.newAdminPass.value=''" 
+                    class="bg-red-600 text-white text-[10px] font-black uppercase py-3 rounded-2xl hover:bg-slate-900 transition-all shadow-lg shadow-red-200">
+                + Add Admin
+            </button>
         </div>
+    </template>
+
+    <!-- Senarai Admin -->
+    <div class="overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="text-[9px] font-black uppercase text-slate-400">
+                    <th class="p-4">Rank</th>
+                    <th class="p-4">Name</th>
+                    <th class="p-4">Email</th>
+                    <th class="p-4">Password</th>
+                    <th class="p-4 text-right">Control</th>
+                </tr>
+            </thead>
+            <tbody class="text-xs">
+                <template x-for="admin in admins" :key="admin.email">
+                    <tr class="border-b border-white/50 hover:bg-white/40 transition-colors">
+                        <td class="p-4">
+                            <span :class="admin.isHead ? 'bg-red-600' : 'bg-slate-400'" 
+                                  class="text-[8px] text-white px-3 py-1 rounded-full font-black uppercase" 
+                                  x-text="admin.isHead ? 'HEAD' : 'STAFF'"></span>
+                        </td>
+                        <td class="p-4 font-black text-slate-900 italic" x-text="admin.name"></td>
+                        <td class="p-4 text-slate-500" x-text="admin.email"></td>
+                        <td class="p-4 font-mono text-red-400" x-text="admin.pass"></td>
+                        <td class="p-4 text-right">
+                            <!-- Butang Remove: Hanya Naqib boleh tekan untuk admin lain -->
+                            <button x-show="currentUser === 'Naqib' && !admin.isHead" 
+                                    @click="removeAdmin(admin.email)" 
+                                    class="text-red-600 font-black hover:underline uppercase text-[9px]">Remove</button>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+</div>
 
         <!-- Jadual Pengguna Berdaftar -->
         <div>
