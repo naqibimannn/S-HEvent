@@ -97,13 +97,17 @@
         loginOpen: false,
         registerOpen: false,
         adminOpen: false,
-        mobileMenuOpen: false, // New: Mobile Menu Logic
-        adminView: 'lobby', // 'lobby', 'users', 'orders'
-        orderTab: 'pending', // 'pending', 'confirmed'
+        mobileMenuOpen: false,
+        adminView: 'lobby',
+        orderTab: 'pending',
         isLoggedIn: false,
         isAdmin: false,
         currentUser: '',
         
+        // Show Password States
+        showLoginPass: false,
+        showRegPass: false,
+
         // Cart & Checkout Data
         cartOpen: false,
         checkoutOpen: false,
@@ -485,7 +489,7 @@
     </div>
 </nav>
 
-<!-- MOBILE MENU OVERLAY (Netflix Merchandise UI Style) -->
+<!-- MOBILE MENU OVERLAY (Updated: No Images, Clean Style) -->
 <div x-show="mobileMenuOpen" 
      x-transition:enter="transition ease-out duration-500"
      x-transition:enter-start="opacity-0"
@@ -502,33 +506,21 @@
         </div>
 
         <div class="grid grid-cols-1 gap-4">
-            <!-- Mobile Navigation Cards -->
-            <button @click="aboutOpen = true; mobileMenuOpen = false" class="group relative h-32 rounded-2xl overflow-hidden bg-slate-900 border border-white/10">
-                <img src="https://images.unsplash.com/photo-1542362567-b055002b91f4?auto=format&fit=crop&w=600" class="absolute inset-0 w-full h-full object-cover opacity-40">
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <span class="heading-font text-white text-xl font-black italic uppercase tracking-widest">About Us</span>
-                </div>
+            <!-- Mobile Navigation Buttons (No Images) -->
+            <button @click="aboutOpen = true; mobileMenuOpen = false" class="py-6 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
+                <span class="heading-font text-white text-lg font-black italic uppercase tracking-widest">About Us</span>
             </button>
 
-            <button @click="merchOpen = true; mobileMenuOpen = false" class="group relative h-32 rounded-2xl overflow-hidden bg-slate-900 border border-white/10">
-                <img src="https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=600" class="absolute inset-0 w-full h-full object-cover opacity-40">
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <span class="heading-font text-white text-xl font-black italic uppercase tracking-widest">Merchandise</span>
-                </div>
+            <button @click="merchOpen = true; mobileMenuOpen = false" class="py-6 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
+                <span class="heading-font text-white text-lg font-black italic uppercase tracking-widest">Merchandise</span>
             </button>
 
-            <button @click="galleryOpen = true; mobileMenuOpen = false" class="group relative h-32 rounded-2xl overflow-hidden bg-slate-900 border border-white/10">
-                <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=600" class="absolute inset-0 w-full h-full object-cover opacity-40">
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <span class="heading-font text-white text-xl font-black italic uppercase tracking-widest">Gallery</span>
-                </div>
+            <button @click="galleryOpen = true; mobileMenuOpen = false" class="py-6 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
+                <span class="heading-font text-white text-lg font-black italic uppercase tracking-widest">Gallery</span>
             </button>
 
-            <button @click="eventOpen = true; mobileMenuOpen = false" class="group relative h-32 rounded-2xl overflow-hidden bg-slate-900 border border-white/10">
-                <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600" class="absolute inset-0 w-full h-full object-cover opacity-40">
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <span class="heading-font text-white text-xl font-black italic uppercase tracking-widest">Event</span>
-                </div>
+            <button @click="eventOpen = true; mobileMenuOpen = false" class="py-6 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
+                <span class="heading-font text-white text-lg font-black italic uppercase tracking-widest">Event</span>
             </button>
 
             <!-- Logout Button -->
@@ -621,7 +613,7 @@
     </div>
 </div>
 
-<!-- ADMIN DASHBOARD OVERLAY (NETFLIX STYLE LOBBY) -->
+<!-- ADMIN DASHBOARD OVERLAY -->
 <div x-show="adminOpen" 
      x-transition:enter="transition ease-out duration-500"
      x-transition:enter-start="opacity-0"
@@ -670,11 +662,7 @@
     </div>
 
     <!-- USER CONTROL PANEL -->
-    <div x-show="adminView === 'users'" class="relative bg-white w-full max-w-5xl max-h-[85vh] rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl"
-         x-transition:enter="transition ease-out duration-500"
-         x-transition:enter-start="opacity-0 translate-y-10"
-         x-transition:enter-end="opacity-100 translate-y-0">
-        
+    <div x-show="adminView === 'users'" class="relative bg-white w-full max-w-5xl max-h-[85vh] rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl">
         <div class="p-8 border-b flex justify-between items-center bg-slate-50">
             <div class="flex items-center gap-4">
                 <button @click="adminView = 'lobby'" class="text-slate-400 hover:text-red-600 transition-colors">← Back</button>
@@ -724,11 +712,7 @@
     </div>
 
     <!-- ORDER LOGS PANEL -->
-    <div x-show="adminView === 'orders'" class="relative bg-white w-full max-w-5xl max-h-[85vh] rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl"
-         x-transition:enter="transition ease-out duration-500"
-         x-transition:enter-start="opacity-0 translate-y-10"
-         x-transition:enter-end="opacity-100 translate-y-0">
-        
+    <div x-show="adminView === 'orders'" class="relative bg-white w-full max-w-5xl max-h-[85vh] rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl">
         <div class="p-8 border-b flex justify-between items-center bg-slate-50">
             <div class="flex items-center gap-4">
                 <button @click="adminView = 'lobby'" class="text-slate-400 hover:text-red-600 transition-colors">← Back</button>
@@ -938,7 +922,7 @@
     </div>
 </div>
 
-<!-- LOGIN OVERLAY -->
+<!-- LOGIN OVERLAY (Updated: Show Password) -->
 <div x-show="loginOpen" 
      x-transition:enter="transition ease-out duration-300" 
      x-transition:enter-start="opacity-0" 
@@ -958,7 +942,13 @@
             </div>
             <div>
                 <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Password</label>
-                <input type="password" x-model="logPass" placeholder="••••••••" class="w-full mt-1 px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:border-red-600 transition-colors font-medium">
+                <div class="relative">
+                    <input :type="showLoginPass ? 'text' : 'password'" x-model="logPass" placeholder="••••••••" class="w-full mt-1 px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:border-red-600 transition-colors font-medium">
+                    <button type="button" @click="showLoginPass = !showLoginPass" class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-600">
+                        <svg x-show="!showLoginPass" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        <svg x-show="showLoginPass" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                    </button>
+                </div>
             </div>
             <div class="flex items-center justify-between px-2 py-2">
                 <label class="flex items-center gap-2 cursor-pointer group">
@@ -973,7 +963,7 @@
     </div>
 </div>
 
-<!-- REGISTER OVERLAY -->
+<!-- REGISTER OVERLAY (Updated: Show Password) -->
 <div x-show="registerOpen" 
      x-transition:enter="transition ease-out duration-300" 
      class="fixed inset-0 z-[70] flex items-center justify-center p-6" x-cloak>
@@ -994,7 +984,13 @@
             </div>
             <div>
                 <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Password</label>
-                <input type="password" x-model="regPass" placeholder="Min 8 characters" class="w-full mt-1 px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:border-red-600 transition-colors font-medium">
+                <div class="relative">
+                    <input :type="showRegPass ? 'text' : 'password'" x-model="regPass" placeholder="Min 8 characters" class="w-full mt-1 px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:border-red-600 transition-colors font-medium">
+                    <button type="button" @click="showRegPass = !showRegPass" class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-600">
+                        <svg x-show="!showRegPass" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        <svg x-show="showRegPass" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                    </button>
+                </div>
             </div>
             <button class="w-full bg-red-600 text-white font-black py-4 rounded-2xl mt-4 hover:bg-slate-950 transition-all shadow-lg hover:shadow-red-200 active:scale-[0.98]">REGISTER NOW</button>
         </form>
@@ -1003,7 +999,7 @@
     </div>
 </div>
 
-<!-- MERCHANDISE OVERLAY -->
+<!-- MERCHANDISE OVERLAY (Updated: Fix Cart Icon Placement) -->
 <div x-show="merchOpen" 
      x-transition:enter="transition ease-out duration-500"
      x-transition:enter-start="opacity-0 translate-y-8"
@@ -1016,12 +1012,17 @@
                 <h3 class="text-red-600 text-xs font-black tracking-[.4em] uppercase mb-1">Official Gear</h3>
                 <h2 class="heading-font text-4xl font-black italic tracking-tighter">MERCHANDISE</h2>
             </div>
-            <div class="flex items-center gap-4">
-                <button @click="merchOpen = false; cartOpen = true" class="relative p-2 text-slate-400 hover:text-red-600 transition-colors">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                    <template x-if="isLoggedIn && cart.length > 0"><span class="absolute top-1 right-1 bg-red-600 text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center" x-text="cart.reduce((sum, item) => sum + item.quantity, 0)"></span></template>
+            <!-- Action Buttons Container -->
+            <div class="flex items-center gap-3">
+                <!-- Cart Button Re-positioned -->
+                <button @click="merchOpen = false; cartOpen = true" class="relative w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-red-600 transition-all shadow-sm">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                    <template x-if="isLoggedIn && cart.length > 0">
+                        <span class="absolute -top-1 -right-1 bg-red-600 text-white text-[8px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white" x-text="cart.reduce((sum, item) => sum + item.quantity, 0)"></span>
+                    </template>
                 </button>
-                <button @click="merchOpen = false" class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all text-xl">✕</button>
+                <!-- Close Button -->
+                <button @click="merchOpen = false" class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all text-xl shadow-sm">✕</button>
             </div>
         </div>
         <div class="overflow-y-auto p-10 pt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
