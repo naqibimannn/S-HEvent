@@ -308,38 +308,71 @@
         },
 
         processOrder() {
+
             if(!this.checkoutForm.name || !this.checkoutForm.phone || !this.checkoutForm.address || !this.checkoutForm.method) {
+
                 return alert('Please fill in all details and select a payment method.');
+
             }
 
+
+
             const total = this.cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+
             
+
             const newOrder = {
+
                 id: 'ORD-' + Math.floor(Math.random() * 1000000),
+
                 customer: this.checkoutForm.name,
+
                 phone: this.checkoutForm.phone,
+
                 address: this.checkoutForm.address,
+
                 method: this.checkoutForm.method,
+
                 items: [...this.cart],
+
                 total: total,
+
                 status: 'pending',
+
                 date: new Date().toLocaleString()
+
             };
 
+
+
             this.allOrders.push(newOrder);
+
             localStorage.setItem('sh_all_orders', JSON.stringify(this.allOrders));
+
             
+
             // Simpan info contact untuk auto-fill masa depan
+
             localStorage.setItem('sh_contact_' + this.currentUser, JSON.stringify({
+
                 name: this.checkoutForm.name,
+
                 phone: this.checkoutForm.phone,
+
                 address: this.checkoutForm.address
+
             }));
 
+
+
             alert('Success! Your order has been placed successfully.');
+
             this.cart = [];
+
             this.saveCart();
+
             this.checkoutOpen = false;
+
         },
 
         confirmOrder(orderId) {
@@ -704,55 +737,93 @@
         </div>
     </div>
 
-    <!-- USER CONTROL PANEL -->
-    <div x-show="adminView === 'users'" class="relative bg-white w-full max-w-5xl max-h-[85vh] rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl">
-        <div class="p-8 border-b flex justify-between items-center bg-slate-50">
-            <div class="flex items-center gap-4">
-                <button @click="adminView = 'lobby'" class="text-slate-400 hover:text-red-600 transition-colors">← Back</button>
-                <div>
-                    <h2 class="heading-font text-xl md:text-2xl font-black italic uppercase">USER MANAGEMENT</h2>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Member Registry</p>
-                </div>
+    <!-- <!-- USER CONTROL PANEL -->
+<div x-show="adminView === 'users'" class="relative bg-white w-full max-w-5xl max-h-[85vh] rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl">
+    <div class="p-8 border-b flex justify-between items-center bg-slate-50">
+        <div class="flex items-center gap-4">
+            <button @click="adminView = 'lobby'" class="text-slate-400 hover:text-red-600 transition-colors">← Back</button>
+            <div>
+                <h2 class="heading-font text-xl md:text-2xl font-black italic uppercase">USER MANAGEMENT</h2>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Community Registry & Admin Access</p>
             </div>
-            <button @click="isAdmin = false; adminOpen = false" class="px-4 py-2 bg-slate-900 text-white text-[10px] font-bold rounded-lg hover:bg-red-600 transition-colors uppercase">User View</button>
         </div>
-        
-        <div class="p-8 overflow-y-auto">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="bg-red-50 p-6 rounded-2xl border border-red-100">
-                    <span class="text-[10px] font-bold text-red-600 uppercase tracking-widest">Registered Users</span>
-                    <h3 class="text-3xl font-black" x-text="getAllUsers().length"></h3>
-                </div>
-                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Master Admins</span>
-                    <h3 class="text-3xl font-black text-white" x-text="admins.length"></h3>
-                </div>
+        <button @click="isAdmin = false; adminOpen = false" class="px-4 py-2 bg-slate-900 text-white text-[10px] font-bold rounded-lg hover:bg-red-600 transition-colors uppercase">User View</button>
+    </div>
+    
+    <div class="p-8 overflow-y-auto">
+        <!-- Statistik Ringkas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-red-50 p-6 rounded-2xl border border-red-100">
+                <span class="text-[10px] font-black text-red-600 uppercase tracking-widest">Total Registered Users</span>
+                <h3 class="text-3xl font-black" x-text="getAllUsers().length"></h3>
             </div>
+            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Master Admins</span>
+                <h3 class="text-3xl font-black text-white" x-text="admins.length"></h3>
+            </div>
+        </div>
 
-            <table class="w-full text-left mb-12">
-                <thead>
-                    <tr class="text-[10px] font-black uppercase text-slate-400 border-b">
-                        <th class="pb-4">Name</th>
-                        <th class="pb-4">Email</th>
-                        <th class="pb-4">Password</th>
-                        <th class="pb-4 text-right">Action</th>
-                    </tr>
-                </thead>
-                <tbody class="text-sm">
-                    <template x-for="user in getAllUsers()" :key="user.email">
-                        <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                            <td class="py-4 font-bold" x-text="user.name"></td>
-                            <td class="py-4 text-slate-500" x-text="user.email"></td>
-                            <td class="py-4 font-mono text-red-300" x-text="user.pass"></td>
-                            <td class="py-4 text-right">
-                                <button @click="deleteUser(user.email)" class="text-red-600 font-bold text-[10px] hover:underline uppercase">Delete</button>
-                            </td>
+        <!-- Jadual Admin (Email & Pass) -->
+        <div class="mb-10">
+            <h3 class="text-xs font-black uppercase tracking-widest text-slate-900 mb-4 flex items-center gap-2">
+                <span class="w-2 h-2 bg-red-600 rounded-full"></span> Admin Access List
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-100">
+                        <tr class="text-[9px] font-black uppercase text-slate-500">
+                            <th class="p-4 rounded-l-xl">Admin Name</th>
+                            <th class="p-4">Email</th>
+                            <th class="p-4 rounded-r-xl">Password</th>
                         </tr>
-                    </template>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="text-sm">
+                        <template x-for="admin in admins" :key="admin.email">
+                            <tr class="border-b border-slate-50">
+                                <td class="p-4 font-black text-red-600 italic" x-text="admin.name"></td>
+                                <td class="p-4 text-slate-600" x-text="admin.email"></td>
+                                <td class="p-4 font-mono text-xs bg-slate-50" x-text="admin.pass"></td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Jadual Pengguna Berdaftar -->
+        <div>
+            <h3 class="text-xs font-black uppercase tracking-widest text-slate-900 mb-4 flex items-center gap-2">
+                <span class="w-2 h-2 bg-slate-400 rounded-full"></span> User Database
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-[9px] font-black uppercase text-slate-400 border-b">
+                            <th class="pb-4 pl-2">Member</th>
+                            <th class="pb-4">Email Address</th>
+                            <th class="pb-4">Password</th>
+                            <th class="pb-4">Joined Date</th>
+                            <th class="pb-4 text-right pr-2">Control</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-xs">
+                        <template x-for="user in getAllUsers()" :key="user.email">
+                            <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                                <td class="py-4 pl-2 font-bold text-slate-900" x-text="user.name"></td>
+                                <td class="py-4 text-slate-500" x-text="user.email"></td>
+                                <td class="py-4 font-mono text-red-400" x-text="user.pass"></td>
+                                <td class="py-4 text-slate-400" x-text="user.date || 'New Member'"></td>
+                                <td class="py-4 text-right pr-2">
+                                    <button @click="deleteUser(user.email)" class="text-red-600 font-black hover:underline uppercase text-[9px]">Remove</button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+</div>
 
     <!-- ORDER LOGS PANEL -->
     <div x-show="adminView === 'orders'" class="relative bg-white w-full max-w-5xl max-h-[85vh] rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl">
