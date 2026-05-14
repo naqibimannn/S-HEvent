@@ -63,6 +63,7 @@
 </head>
 <body class="text-slate-900"
       x-data="{
+        aboutOpen: false,
         merchOpen: false,
         galleryOpen: false,
         loginOpen: false,
@@ -76,7 +77,22 @@
         layoutData: {
             heroBg: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200',
             eventTitle: 'Proton X Perodua Day',
-            eventImg: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=1200'
+            eventImg: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=1200',
+            // Tambah section aboutContent
+            aboutContent: [
+                {
+                    title: 'DRIVEN BY PASSION',
+                    desc: 'S&H Event was founded on the principles of automotive excellence. We bring together the finest machinery and the most passionate drivers in Malaysia.',
+                    img: 'https://images.unsplash.com/photo-1542362567-b055002b91f4?auto=format&fit=crop&q=80&w=800',
+                    side: 'left'
+                },
+                {
+                    title: 'THE COMMUNITY',
+                    desc: 'It is more than just a car show; it is a lifestyle. Our events serve as a hub for enthusiasts to share knowledge, style, and the thrill of the open road.',
+                    img: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&q=80&w=800',
+                    side: 'right'
+                }
+            ]
         },
         merchandise: [],
         gallery: [],
@@ -93,10 +109,8 @@
         rememberMe: false,
 
         init() {
-            // URL data dari GitHub anda
             const dataUrl = 'https://raw.githubusercontent.com/naqibimannn/S-HEvent/refs/heads/main/data.json';
 
-            // 1. Tarik data terbaru dari GitHub
             fetch(dataUrl)
                 .then(res => res.json())
                 .then(data => {
@@ -107,7 +121,6 @@
                 })
                 .catch(err => {
                     console.warn('Gagal tarik data GitHub, guna data tempatan.', err);
-                    // Backup: Kalau internet takde atau link salah, guna data lama dalam browser
                     const savedLayout = JSON.parse(localStorage.getItem('sh_layout'));
                     if (savedLayout) this.layoutData = savedLayout;
                     
@@ -118,7 +131,6 @@
                     if (savedGallery) this.gallery = savedGallery;
                 });
 
-            // 2. Semak sesi log masuk (Login tetap simpan dalam browser masing-masing)
             const session = JSON.parse(localStorage.getItem('sh_session'));
             const savedEmail = localStorage.getItem('sh_remember_email');
             const savedPass = localStorage.getItem('sh_remember_pass');
@@ -241,7 +253,8 @@
     </div>
 
     <div class="hidden lg:flex items-center space-x-10 text-[11px] uppercase tracking-[0.2em] font-black text-slate-700">
-        <a href="#" class="hover:text-red-600 transition-colors">About Us</a>
+        <!-- Tukar link kepada button untuk About Us -->
+        <button @click="aboutOpen = true" class="hover:text-red-600 transition-colors uppercase cursor-pointer">About Us</button>
         <button @click="merchOpen = true" class="hover:text-red-600 transition-colors uppercase cursor-pointer">Merchandise</button>
         <button @click="galleryOpen = true" class="hover:text-red-600 transition-colors uppercase cursor-pointer">Gallery</button>
         <a href="#" class="hover:text-red-600 transition-colors">Event</a>
@@ -262,12 +275,47 @@
     </div>
 </nav>
 
-<!-- ADMIN FLOATING BUTTON -->
-<div x-show="isLoggedIn && isAdmin" class="fixed bottom-6 right-6 z-[100]" x-cloak>
-    <button @click="adminOpen = !adminOpen" class="w-14 h-14 bg-red-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform">
-        <svg x-show="!adminOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-        <span x-show="adminOpen" class="font-bold">✕</span>
-    </button>
+<!-- ABOUT US OVERLAY (KOD BARU) -->
+<div x-show="aboutOpen"
+     class="fixed inset-0 z-[65] flex items-center justify-center p-4 md:p-10" x-cloak>
+    <div @click="aboutOpen = false" class="absolute inset-0 bg-white/60 backdrop-blur-md"></div>
+    <div class="relative bg-white w-full max-w-6xl max-h-[85vh] overflow-hidden rounded-[2.5rem] shadow-2xl flex flex-col"
+         x-show="aboutOpen"
+         x-transition:enter="transition ease-out duration-500"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100">
+        
+        <div class="p-10 pb-4 flex justify-between items-center">
+            <div>
+                <h3 class="text-red-600 text-xs font-black tracking-[.4em] uppercase mb-1">Our Mission</h3>
+                <h2 class="heading-font text-4xl font-black italic tracking-tighter uppercase">ABOUT US</h2>
+            </div>
+            <button @click="aboutOpen = false" class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all text-xl">✕</button>
+        </div>
+
+        <div class="overflow-y-auto p-10 space-y-24">
+            <template x-for="(section, index) in layoutData.aboutContent" :key="index">
+                <div :class="section.side === 'left' ? 'flex flex-col md:flex-row' : 'flex flex-col md:flex-row-reverse'" class="items-center gap-12">
+                    <!-- Image Side -->
+                    <div class="w-full md:w-1/2 aspect-video md:aspect-[4/3] rounded-[2rem] overflow-hidden shadow-xl netflix-card">
+                        <img :src="section.img" class="w-full h-full object-cover">
+                    </div>
+                    <!-- Text Side -->
+                    <div class="w-full md:w-1/2 space-y-6">
+                        <div class="flex items-center gap-3">
+                            <span class="w-12 h-[2px] bg-red-600"></span>
+                            <h4 class="heading-font text-2xl font-black italic uppercase" x-text="section.title"></h4>
+                        </div>
+                        <p class="text-slate-600 text-lg leading-relaxed font-medium" x-text="section.desc"></p>
+                    </div>
+                </div>
+            </template>
+            <!-- Footer dalam modal -->
+            <div class="py-12 border-t text-center">
+                <p class="heading-font italic font-black text-slate-300 uppercase tracking-widest text-sm">S&H Event Services • Est. 2026</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- ADMIN DASHBOARD OVERLAY -->
@@ -365,9 +413,33 @@
                         <button @click="addMerch(document.getElementById('mName').value, document.getElementById('mPrice').value, document.getElementById('mUrl').value); document.getElementById('mName').value=''; document.getElementById('mPrice').value=''; document.getElementById('mUrl').value=''" class="bg-red-600 text-white text-[10px] font-black rounded-lg uppercase">Add Product</button>
                     </div>
                 </div>
+
+                <!-- Admin About Us Manager (KOD BARU) -->
+                <div class="mt-8 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                    <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">About Us Manager</h4>
+                    <div class="space-y-4">
+                        <template x-for="(section, index) in layoutData.aboutContent" :key="index">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white rounded-xl border border-slate-100">
+                                <div class="col-span-full font-bold text-xs" x-text="'Section ' + (index+1)"></div>
+                                <input type="text" x-model="section.title" placeholder="Title" class="p-2 text-xs border rounded-lg outline-none">
+                                <input type="text" x-model="section.img" placeholder="Image URL" class="p-2 text-xs border rounded-lg outline-none">
+                                <textarea x-model="section.desc" class="p-2 text-xs border rounded-lg outline-none md:col-span-2 h-16" placeholder="Description"></textarea>
+                            </div>
+                        </template>
+                        <button @click="updateLayout()" class="w-full py-3 bg-slate-900 text-white text-[10px] font-black rounded-lg uppercase">Update About Content</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- ADMIN FLOATING BUTTON -->
+<div x-show="isLoggedIn && isAdmin" class="fixed bottom-6 right-6 z-[100]" x-cloak>
+    <button @click="adminOpen = !adminOpen" class="w-14 h-14 bg-red-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform">
+        <svg x-show="!adminOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        <span x-show="adminOpen" class="font-bold">✕</span>
+    </button>
 </div>
 
 <!-- LOGIN OVERLAY -->
@@ -554,8 +626,9 @@
         <p class="max-w-xl mx-auto text-slate-800 text-sm md:text-base mb-8 font-semibold leading-relaxed">
             An exclusive automotive community uniting performance style and the spirit of machinery in one prestigious event.
         </p>
-        <div class="flex justify-center">
+        <div class="flex justify-center gap-4">
             <button @click="galleryOpen = true" class="bg-slate-900 text-white px-12 py-4 rounded-full font-bold shadow-lg shadow-gray-200 hover:bg-red-600 transition-all duration-300 hover:scale-105">View Gallery</button>
+            <button @click="aboutOpen = true" class="bg-white/50 backdrop-blur text-slate-900 border border-slate-200 px-12 py-4 rounded-full font-bold hover:bg-white transition-all duration-300 hover:scale-105">Our Story</button>
         </div>
     </div>
 </header>
