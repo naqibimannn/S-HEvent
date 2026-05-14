@@ -86,6 +86,19 @@
             transform: scale(1.05);
             border-color: #e50914;
         }
+
+        .logo-split {
+    background: linear-gradient(to bottom, #dc2626 50%, #facc15 50%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    
+    /* Betulkan masalah terpotong */
+    padding-top: 0.1em;    /* Ruang atas supaya tak potong hujung H */
+    padding-right: 0.2em;  /* Ruang kanan supaya tak potong condong Italic */
+    margin-right: -0.15em; /* Rapatkan balik jarak dengan perkataan EVENT */
+    line-height: 1.2;
+}
     </style>
 </head>
 <body class="text-slate-900"
@@ -519,7 +532,7 @@
 <!-- Navbar -->
 <nav class="fixed w-[92%] md:w-[85%] left-1/2 -translate-x-1/2 top-6 z-50 flex justify-between items-center px-8 py-4 bg-white/40 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] rounded-2xl transition-all duration-300">
     <div class="text-xl font-black tracking-tighter heading-font group cursor-pointer" onclick="window.location.reload()">
-        <span class="text-red-600">S&H</span>
+        <span class="logo-split">S&H</span>
         <span class="text-slate-900">EVENT</span>
     </div>
 
@@ -1211,7 +1224,9 @@
 <header class="car-hero-new flex flex-col items-center justify-center text-center px-4" :style="`--hero-bg: url('${layoutData.heroBg}')`">
     <div class="z-10 mt-12">
         <h2 class="text-sm font-bold tracking-[0.3em] uppercase mb-4 text-red-600" x-text="translations[lang].heroSub"></h2>
-        <h1 class="text-5xl md:text-8xl font-black heading-font mb-6 tracking-tighter italic text-slate-950"><span class="text-red-600">S&H</span> EVENT</h1>
+        <h1 class="text-5xl md:text-8xl font-black heading-font mb-6 tracking-tighter italic text-slate-950 py-2">
+    <span class="logo-split">S&H</span> EVENT
+</h1>
         <p class="max-w-xl mx-auto text-slate-800 text-sm md:text-base mb-8 font-semibold leading-relaxed" x-text="translations[lang].heroDesc"></p>
         <div class="flex justify-center gap-4">
             <button @click="galleryOpen = true" x-text="translations[lang].viewGallery" class="bg-slate-900 text-white px-12 py-4 rounded-full font-bold shadow-lg shadow-gray-200 hover:bg-red-600 transition-all duration-300 hover:scale-105"></button>
@@ -1376,7 +1391,13 @@
 
 <!-- Footer -->
 <footer class="bg-white border-t border-slate-50 py-12 px-6 text-center">
-    <div class="flex justify-center gap-6 mb-6 opacity-30"><span class="w-8 h-[1px] bg-slate-900 self-center"></span><div class="heading-font text-xs font-black tracking-tighter italic"><span class="text-red-600">S&H</span> EVENT</div><span class="w-8 h-[1px] bg-slate-900 self-center"></span></div>
+    <div class="flex justify-center gap-6 mb-6 opacity-30">
+        <span class="w-8 h-[1px] bg-slate-900 self-center"></span>
+        <div class="heading-font text-xs font-black tracking-tighter italic">
+            <span class="logo-split">S&H</span> EVENT
+        </div>
+        <span class="w-8 h-[1px] bg-slate-900 self-center"></span>
+    </div>
     <p class="text-[9px] text-slate-400 font-bold tracking-[0.3em] uppercase leading-loose">© 2026 S&H EVENT SERVICES. Engineered for Speed.<br><span class="opacity-50">Powered by Secure Malaysian Payment Gateways</span></p>
 </footer>
 
