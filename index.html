@@ -115,6 +115,7 @@
     -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
     mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
 }
+
     </style>
 </head>
 <body class="text-slate-900"
@@ -132,8 +133,9 @@
         isLoggedIn: false,
         isAdmin: false,
         currentUser: '',
-        
-        // Tambah dalam x-data anda
+
+        userOrdersOpen: false,
+    
 profileOpen: false,
 profileForm: {
     oldPass: '',
@@ -141,6 +143,26 @@ profileForm: {
     profilePic: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
 },
         
+
+// Tambah fungsi ini di dalam x-data anda
+updateTracking(orderId, trackingNum) {
+    const order = this.allOrders.find(o => o.id === orderId);
+    if(order) {
+        order.tracking = trackingNum;
+        localStorage.setItem('sh_all_orders', JSON.stringify(this.allOrders));
+        alert('Tracking number updated for ' + orderId);
+    }
+},
+
+saveTracking(orderId, trackingNum) {
+    const order = this.allOrders.find(o => o.id === orderId);
+    if(order) {
+        order.tracking = trackingNum;
+        localStorage.setItem('sh_all_orders', JSON.stringify(this.allOrders));
+        alert('Tracking Number Saved: ' + trackingNum);
+    }
+},
+
         // --- NEW: Language State ---
         lang: 'en',
         translations: {
@@ -598,6 +620,7 @@ deleteUser(email) {
 
       }">
 
+
       <!-- RED BLUR SECURITY OVERLAY -->
 <div x-show="warningPageOpen" 
      x-transition:enter="transition ease-out duration-500"
@@ -725,11 +748,11 @@ deleteUser(email) {
                     My Profile
                 </button>
                 
-                <button @click="isAdmin ? (adminOpen = true, adminView = 'orders', open = false) : alert('Coming Soon: Order Tracking')" 
-                        class="w-full flex items-center gap-3 px-4 py-2.5 text-[10px] font-bold text-slate-700 hover:bg-slate-50 hover:text-red-600 transition-colors uppercase tracking-wider text-left">
-                    <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                    Order Status
-                </button>
+                <button @click="userOrdersOpen = true; open = false" 
+        class="w-full flex items-center gap-3 px-4 py-2.5 text-[10px] font-bold text-slate-700 hover:bg-slate-50 hover:text-red-600 transition-colors uppercase tracking-wider text-left">
+    <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+    Order Status
+</button>
 
                 <div class="h-[1px] bg-slate-50 my-1"></div>
 
@@ -1265,6 +1288,95 @@ deleteUser(email) {
             </div>
             <button @click="cartOpen = false; checkoutOpen = true" x-text="lang === 'en' ? 'CHECKOUT NOW' : 'BAYAR SEKARANG'" class="w-full bg-slate-950 text-white font-black py-5 rounded-2xl hover:bg-red-600 transition-all duration-500 shadow-xl hover:shadow-red-200 uppercase tracking-[0.2em] text-[10px] transform active:scale-95">
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- USER ORDER STATUS OVERLAY (UI Merchandise Style) -->
+<div x-show="userOrdersOpen" 
+     x-transition:enter="transition ease-out duration-500"
+     x-transition:enter-start="opacity-0 translate-y-8"
+     x-transition:enter-end="opacity-100 translate-y-0"
+     class="fixed inset-0 z-[115] flex items-center justify-center p-4 md:p-10" x-cloak>
+    
+    <div @click="userOrdersOpen = false" class="absolute inset-0 bg-white/60 backdrop-blur-md"></div>
+    
+    <div class="relative bg-white w-full max-w-6xl max-h-[85vh] overflow-hidden rounded-[2.5rem] shadow-2xl flex flex-col">
+        <!-- Header -->
+        <div class="p-10 pb-4 flex justify-between items-center">
+            <div>
+                <h3 class="text-red-600 text-xs font-black tracking-[.4em] uppercase mb-1" x-text="lang === 'en' ? 'Track My Gear' : 'Jejak Pesanan'"></h3>
+                <h2 class="heading-font text-4xl font-black italic tracking-tighter uppercase" x-text="lang === 'en' ? 'Order Status' : 'Status Pesanan'"></h2>
+            </div>
+            <button @click="userOrdersOpen = false" class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all text-xl">✕</button>
+        </div>
+
+        <!-- Content Area -->
+        <div class="overflow-y-auto p-10 pt-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Loop pesanan milik user yang sedang login sahaja -->
+                <template x-for="order in allOrders.filter(o => o.customer === checkoutForm.name)" :key="order.id">
+                    <div class="group relative flex flex-col bg-slate-50 rounded-[2rem] border border-slate-100 overflow-hidden hover:shadow-2xl transition-all duration-500">
+                        
+                        <!-- Status Badge -->
+                        <div class="absolute top-4 right-4 z-10">
+                            <span :class="order.status === 'confirmed' ? 'bg-green-500' : 'bg-yellow-500'" 
+                                  class="text-[8px] font-black text-white px-3 py-1 rounded-full uppercase tracking-widest shadow-lg"
+                                  x-text="order.status"></span>
+                        </div>
+
+                        <!-- Info Header -->
+                        <div class="p-6 bg-white border-b border-slate-50">
+                            <p class="text-[9px] font-black text-red-600 uppercase tracking-widest" x-text="order.id"></p>
+                            <h4 class="font-black text-xs text-slate-900 mt-1 uppercase" x-text="order.date"></h4>
+                        </div>
+
+                        <!-- Item Summary (Macam Merch Card) -->
+                        <div class="p-6 flex-1 space-y-4">
+                            <div class="flex flex-wrap gap-2">
+                                <template x-for="item in order.items">
+                                    <div class="flex items-center gap-2 bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
+                                        <img :src="item.url" class="w-8 h-8 rounded-lg object-cover">
+                                        <span class="text-[9px] font-bold text-slate-700" x-text="'x' + item.quantity"></span>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div class="pt-4 border-t border-slate-200/50">
+                                <p class="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Tracking Number</p>
+                                <!-- Paparan Tracking Number dari Admin -->
+                                <div class="bg-slate-900 text-white p-4 rounded-2xl flex items-center justify-between group/track">
+                                    <span class="font-mono text-[11px] tracking-wider" 
+                                          x-text="order.tracking ? order.tracking : (lang === 'en' ? 'PENDING...' : 'DALAM PROSES...')"></span>
+                                    
+                                    <template x-if="order.tracking">
+                                        <button @click="navigator.clipboard.writeText(order.tracking); alert('Copied!')" class="text-white/40 hover:text-red-500 transition-colors">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                                        </button>
+                                    </template>
+                                </div>
+                                <p class="text-[7px] text-slate-400 mt-2 italic">*Kemas kini tracking disediakan oleh Admin S&H.</p>
+                            </div>
+                        </div>
+
+                        <!-- Total Footer -->
+                        <div class="p-6 bg-slate-100/50 flex justify-between items-center">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Paid</span>
+                            <span class="text-lg font-black heading-font italic text-slate-900" x-text="'RM ' + order.total"></span>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Empty State -->
+                <template x-if="allOrders.filter(o => o.customer === checkoutForm.name).length === 0">
+                    <div class="col-span-full py-20 text-center flex flex-col items-center">
+                        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-200 mb-4">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        </div>
+                        <p class="heading-font italic text-slate-400 text-sm uppercase" x-text="lang === 'en' ? 'No orders found' : 'Tiada rekod pesanan'"></p>
+                    </div>
+                </template>
+            </div>
         </div>
     </div>
 </div>
