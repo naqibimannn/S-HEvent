@@ -21,6 +21,12 @@
 
         .heading-font { font-family: 'Orbitron', sans-serif; }
 
+        .overflow-hidden {
+    overflow: hidden;
+    /* Mengelakkan layout 'lompat' apabila scrollbar hilang */
+    padding-right: 6px; 
+}
+
         .car-hero-new {
             position: relative;
             height: 100vh;
@@ -119,6 +125,7 @@
     </style>
 </head>
 <body class="text-slate-900"
+      :class="{ 'overflow-hidden': aboutOpen || eventOpen || merchOpen || galleryOpen || loginOpen || registerOpen || adminOpen || cartOpen || userOrdersOpen || profileOpen }"
       x-data="{
         aboutOpen: false,
         eventOpen: false,
