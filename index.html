@@ -648,38 +648,38 @@ deleteUser(email) {
         <button @click="eventOpen = true" x-text="translations[lang].event" class="hover:text-red-600 transition-colors uppercase cursor-pointer"></button>
     </div>
     
-    <div class="flex items-center gap-4">
-        <div class="relative mr-2">
-            <button @click="isLoggedIn ? cartOpen = true : loginOpen = true" class="p-2 hover:text-red-600 transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-                <template x-if="isLoggedIn && cart.length > 0">
-                    <span class="absolute -top-1 -right-1 bg-red-600 text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center" x-text="cart.reduce((sum, item) => sum + item.quantity, 0)"></span>
-                </template>
-            </button>
-        </div>
+    <div class="flex items-center gap-2">
+        <!-- Cart Button -->
+        <button @click="isLoggedIn ? cartOpen = true : loginOpen = true" class="p-2 hover:text-red-600 transition-colors relative">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            <template x-if="isLoggedIn && cart.length > 0">
+                <span class="absolute top-0 right-0 bg-red-600 text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center" x-text="cart.reduce((sum, item) => sum + item.quantity, 0)"></span>
+            </template>
+        </button>
 
-        <!-- Desktop/Mobile Login Switch -->
-        <template x-if="!isLoggedIn">
-            <button @click="loginOpen = true" x-text="translations[lang].login" class="text-[10px] font-black text-white bg-slate-950 px-8 py-2.5 rounded-xl hover:bg-red-600 hover:shadow-lg hover:shadow-red-200 transition-all duration-300 transform active:scale-95">
-            </button>
-        </template>
-
-        <!-- Mobile Hamburger (Only visible when logged in on mobile) -->
-        <template x-if="isLoggedIn">
-            <div class="flex items-center">
-                <button @click="mobileMenuOpen = true" class="lg:hidden p-2 text-slate-900 hover:text-red-600 transition-colors">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
+        <!-- Login / User Info -->
+        <div class="flex items-center gap-2">
+            <template x-if="!isLoggedIn">
+                <button @click="loginOpen = true" x-text="translations[lang].login" class="text-[10px] font-black text-white bg-slate-950 px-5 md:px-8 py-2.5 rounded-xl hover:bg-red-600 transition-all transform active:scale-95">
                 </button>
+            </template>
+
+            <template x-if="isLoggedIn">
                 <div class="hidden lg:flex items-center gap-3">
                     <span class="text-[10px] font-bold text-slate-600 uppercase" x-text="(isAdmin ? '[ADMIN] ' : '') + 'Hi, ' + currentUser"></span>
                     <button @click="logout()" x-text="translations[lang].logout" class="text-[10px] font-black text-red-600 border border-red-600 px-4 py-2 rounded-lg hover:bg-red-600 hover:text-white transition-all"></button>
                 </div>
-            </div>
-        </template>
+            </template>
+
+            <!-- Mobile Hamburger (Sentiasa ada untuk mobile) -->
+            <button @click="mobileMenuOpen = true" class="lg:hidden p-2 text-slate-900 hover:text-red-600 transition-colors">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
     </div>
 </nav>
 
@@ -698,6 +698,11 @@ deleteUser(email) {
             </div>
             <button @click="mobileMenuOpen = false" class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white text-xl">✕</button>
         </div>
+        <!-- Cari dalam Mobile Menu Overlay bahagian butang Logout -->
+<template x-if="isLoggedIn">
+    <button @click="logout()" x-text="translations[lang].logout" class="mt-8 py-5 rounded-2xl bg-red-600 text-white font-black heading-font italic tracking-widest uppercase shadow-xl shadow-red-500/20 active:scale-95 transition-transform">
+    </button>
+</template>
 
         <div class="grid grid-cols-1 gap-4">
             <!-- Mobile Navigation Buttons (No Images) -->
@@ -886,7 +891,7 @@ deleteUser(email) {
         </div>
     </div>
 
-    <!-- <!-- USER CONTROL PANEL -->
+    <!-- USER CONTROL PANEL -->
 <div x-show="adminView === 'users'" class="relative bg-white w-full max-w-5xl max-h-[85vh] rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl">
     <div class="p-8 border-b flex justify-between items-center bg-slate-50">
         <div class="flex items-center gap-4">
