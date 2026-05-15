@@ -1078,7 +1078,7 @@ deleteUser(email) {
 <!-- ADMIN FLOATING BUTTON (VERSION CLICKABLE WARNING) -->
 <div x-show="isLoggedIn && isAdmin" class="fixed bottom-6 right-6 z-[100]" x-cloak>
     
-    <!-- Warning Icon yang boleh ditekan -->
+    <!-- Warning Icon yang boleh ditekan (Security Alert) -->
     <template x-if="securityAlert">
         <button @click="warningPageOpen = true" 
                 class="absolute -top-14 right-0 bg-red-600 text-white px-5 py-2.5 rounded-2xl shadow-2xl animate-bounce flex items-center gap-2 border-2 border-white whitespace-nowrap hover:scale-110 transition-transform z-[110]">
@@ -1090,9 +1090,17 @@ deleteUser(email) {
         </button>
     </template>
 
-    <!-- Butang Admin Utama Tetap Sama -->
+    <!-- Butang Admin Utama dengan Notifikasi Order -->
     <button @click="adminOpen = !adminOpen; adminView = 'lobby'" 
             class="group relative flex items-center gap-3 bg-red-600 text-white pl-4 pr-6 py-3 rounded-full shadow-lg hover:scale-105 transition-all duration-500">
+        
+        <!-- Badge Notifikasi Order Pending -->
+        <template x-if="getPendingCount() > 0">
+            <span class="absolute -top-2 -left-2 bg-white text-red-600 text-[10px] font-black w-6 h-6 rounded-full flex items-center justify-center border-2 border-red-600 animate-pulse shadow-lg z-[110]" 
+                  x-text="getPendingCount()">
+            </span>
+        </template>
+
         <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
         </div>
