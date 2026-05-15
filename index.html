@@ -134,6 +134,8 @@
         isAdmin: false,
         currentUser: '',
 
+        searchQuery: '',
+
         userOrdersOpen: false,
     
 profileOpen: false,
@@ -389,72 +391,46 @@ removeAdmin(email) {
         },
 
         processOrder() {
+    if(!this.checkoutForm.name || !this.checkoutForm.phone || !this.checkoutForm.address || !this.checkoutForm.method) {
+        return alert('Sila isi semua maklumat penghantaran.');
+    }
 
-            if(!this.checkoutForm.name || !this.checkoutForm.phone || !this.checkoutForm.address || !this.checkoutForm.method) {
+    // --- LOGIK NOMBOR ID BARU ---
+    // Mengira jumlah order sedia ada dan tambah 1
+    const nextNumber = (this.allOrders.length + 1).toString().padStart(6, '0');
+    const newOrderId = 'ORD-SH ' + nextNumber;
 
-                return alert('Please fill in all details and select a payment method.');
+    const total = this.cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+    
+    const newOrder = {
+        id: newOrderId,
+        customer: this.checkoutForm.name,
+        phone: this.checkoutForm.phone,
+        address: this.checkoutForm.address,
+        method: this.checkoutForm.method,
+        items: [...this.cart],
+        total: total,
+        status: 'pending',
+        tracking: '', // Ruang kosong untuk admin isi nanti
+        date: new Date().toLocaleString()
+    };
 
-            }
+    this.allOrders.push(newOrder);
+    localStorage.setItem('sh_all_orders', JSON.stringify(this.allOrders));
+    
+    // Simpan info untuk auto-fill masa depan
+    localStorage.setItem('sh_contact_' + this.currentUser, JSON.stringify({
+        name: this.checkoutForm.name,
+        phone: this.checkoutForm.phone,
+        address: this.checkoutForm.address
+    }));
 
-
-
-            const total = this.cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
-
-            
-
-            const newOrder = {
-
-                id: 'ORD-' + Math.floor(Math.random() * 1000000),
-
-                customer: this.checkoutForm.name,
-
-                phone: this.checkoutForm.phone,
-
-                address: this.checkoutForm.address,
-
-                method: this.checkoutForm.method,
-
-                items: [...this.cart],
-
-                total: total,
-
-                status: 'pending',
-
-                date: new Date().toLocaleString()
-
-            };
-
-
-
-            this.allOrders.push(newOrder);
-
-            localStorage.setItem('sh_all_orders', JSON.stringify(this.allOrders));
-
-            
-
-            // Simpan info contact untuk auto-fill masa depan
-
-            localStorage.setItem('sh_contact_' + this.currentUser, JSON.stringify({
-
-                name: this.checkoutForm.name,
-
-                phone: this.checkoutForm.phone,
-
-                address: this.checkoutForm.address
-
-            }));
-
-
-
-            alert('Success! Your order has been placed successfully.');
-
-            this.cart = [];
-
-            this.saveCart();
-
-            this.checkoutOpen = false;
-
-        },
+    alert('Berjaya! No. Pesanan anda ialah: ' + newOrderId);
+    this.cart = [];
+    this.saveCart();
+    this.checkoutOpen = false;
+    this.searchQuery = ''; // Reset carian
+},
 
         confirmOrder(orderId) {
             const order = this.allOrders.find(o => o.id === orderId);
@@ -1149,7 +1125,8 @@ deleteUser(email) {
                     </tr>
                 </thead>
                 <tbody class="text-sm">
-                    <template x-for="order in allOrders.filter(o => o.status === orderTab)" :key="order.id">
+                    <template x-for="order in allOrders.filter(o => o.status === orderTab && o.id.toLowerCase().includes(searchQuery.toLowerCase()))" :key="order.id">
+    ```
                         <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
                             <td class="py-6 align-top">
                                 <div class="font-black text-red-600 uppercase text-[10px]" x-text="order.id"></div>
@@ -1328,7 +1305,8 @@ deleteUser(email) {
         <div class="overflow-y-auto p-10 pt-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Loop pesanan milik user yang sedang login sahaja -->
-                <template x-for="order in allOrders.filter(o => o.customer === checkoutForm.name)" :key="order.id">
+               <template x-for="order in allOrders.filter(o => o.customer === checkoutForm.name && o.id.toLowerCase().includes(searchQuery.toLowerCase()))" :key="order.id">
+    ```
                     <div class="group relative flex flex-col bg-slate-50 rounded-[2rem] border border-slate-100 overflow-hidden hover:shadow-2xl transition-all duration-500">
                         
                         <!-- Status Badge -->
