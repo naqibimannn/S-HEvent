@@ -271,7 +271,12 @@ profileMenuOpen: false,
             'https://scontent.fkul4-5.fna.fbcdn.net/v/t39.30808-6/690747890_934947526197860_3271556012197097149_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=833d8c&_nc_ohc=qJ_bR4lPWKIQ7kNvwGZ4Hcf&_nc_oc=AdosBy8fW4waG9NFacSvfXujIXiqeTgl-rrOdGJZZzooziJBeZVrvd0ezjJGePG_YW1YQp18Gn10NOMU9sjQmxtS&_nc_zt=23&_nc_ht=scontent.fkul4-5.fna&_nc_gid=nNep-kc26ui8ccdKACaf5A&_nc_ss=7b2a8&oh=00_Af61VvcAuUJ14EehJsmR7mFY3wreK_Y8Mrg0E7aYhSTaoQ&oe=6A0A6408',
             'https://scontent.fkul4-4.fna.fbcdn.net/v/t39.30808-6/631640192_865264856499461_3587251614696265315_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=833d8c&_nc_ohc=30TG0GaOKwwQ7kNvwGe2LN3&_nc_oc=Adq6Zyy3iw8bzh-bHlcXM1InChv2Tk_HR5tvdbv08yPoupUS7eRldtm9PDo1uFpdJLiQg-j8iqlragRJHSVqUg_u&_nc_zt=23&_nc_ht=scontent.fkul4-4.fna&_nc_gid=HZURlJSW8pBahckA343Iig&_nc_ss=7b2a8&oh=00_Af5D-RM6iPeWLO2d8KtwsilqQyuVwsq8K-SX5Cmr2xw6JA&oe=6A0A786F',
             'https://scontent.fkul4-4.fna.fbcdn.net/v/t39.30808-6/632967209_863613353331278_5501241384741430508_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=FbNvLmnrV_wQ7kNvwGrSBuI&_nc_oc=Adp2h7pU9a7mj0qAThKU_EYuXSuiEcVFebP51M4BfFC05F2LrYvJd4ZdhE5etjc_JmtbsRQqhpho_irys70R43_m&_nc_zt=23&_nc_ht=scontent.fkul4-4.fna&_nc_gid=gUqHVb1-KpwTqeSSmC9SwQ&_nc_ss=7b2a8&oh=00_Af6FhyCIF5Z-Nl_zvwSSSEQec0ecosuFBy_dPph4Z9Q7tA&oe=6A0A89D1'
-        ],
+        
+            ],
+
+
+
+    
 
         // Admin Master List
         // 1. Kita tambah 'isHead' untuk bezakan Naqib dengan admin lain
@@ -918,76 +923,66 @@ deleteUser(email) {
     <div @click="adminOpen = false" class="absolute inset-0 bg-slate-950/95 backdrop-blur-2xl"></div>
     
     <!-- ADMIN LOBBY -->
-    <div x-show="adminView === 'lobby'" 
-    class="relative w-full max-w-6xl"
-         x-transition:enter="transition ease-out duration-700 transform"
-         x-transition:enter-start="opacity-0 scale-105 translate-y-10"
-         x-transition:enter-end="opacity-100 scale-100 translate-y-0">
+   <div x-show="adminView === 'lobby'" 
+     class="relative w-full max-w-6xl"
+     x-transition:enter="transition ease-out duration-700 transform"
+     x-transition:enter-start="opacity-0 scale-105 translate-y-10"
+     x-transition:enter-end="opacity-100 scale-100 translate-y-0">
 
-         <!-- SECURITY ALERT BANNER -->
-<template x-if="securityAlert">
-    <div class="mb-8 p-6 bg-red-600 rounded-[2rem] border-4 border-red-400 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 text-white">
-        <div class="flex items-center gap-6">
-            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl animate-pulse">🚫</div>
-            <div>
-                <h3 class="heading-font text-2xl font-black italic italic tracking-tighter">SECURITY BREACH DETECTED</h3>
-                <p class="text-xs font-bold opacity-80 uppercase tracking-widest" x-text="'Target: ' + alertDetails.email + ' | Attempted: ' + alertDetails.time"></p>
-                <p class="text-[10px] mt-1 font-medium italic">*Unauthorized login attempts exceeded the 3-limit threshold.</p>
-            </div>
+     <!-- SECURITY ALERT BANNER (Kekalkan jika perlu) -->
+     <template x-if="securityAlert">
+         <!-- ... kod security alert anda ... -->
+     </template>
+    
+    <div class="mb-12 text-center md:text-left">
+        <h1 class="heading-font text-white text-3xl md:text-5xl font-black mb-2 tracking-tighter uppercase italic">Admin Control Centre</h1>
+        <p class="text-red-600 font-black text-xs tracking-[0.4em] uppercase">Select Management Module</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+       <!-- MODUL 1: WEBSITE MANAGEMENT (Aligned to left) -->
+<button @click="adminView = 'users'" class="group relative aspect-[16/7] md:aspect-[16/6] overflow-hidden rounded-2xl bg-slate-900 border border-white/10 hover:border-red-600 transition-all duration-500">
+    <img src="https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&q=80&w=1200" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 group-hover:scale-110 transition-all duration-700">
+    
+    <!-- Container di bawah menggunakan items-start untuk paksi kiri -->
+    <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/60 to-transparent p-8 md:p-12 flex flex-col justify-center items-start text-left">
+        
+        <!-- Ikon Edit -->
+        <div class="bg-red-600 p-3 rounded-xl mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
         </div>
-        <button @click="securityAlert = false; loginAttempts = 0" 
-                class="bg-white text-red-600 px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all shadow-xl">
-            Tindakan Diambil / Clear Alert
+
+        <!-- Teks sudah sejajar di tepi (items-start) -->
+        <h2 class="heading-font text-white text-2xl md:text-4xl font-black italic uppercase tracking-tighter">
+            Website Management
+        </h2>
+        <p class="text-slate-400 text-[10px] md:text-xs font-bold mt-2 uppercase tracking-widest">
+            Update layout, contents & event assets
+        </p>
+    </div>
+</button>
+        
+        <!-- MODUL 2: ORDER LOGS (Kekalkan atau ubah sedikit) -->
+        <button @click="adminView = 'orders'" class="group relative aspect-[16/7] md:aspect-[16/6] overflow-hidden rounded-2xl bg-slate-900 border border-white/10 hover:border-red-600 transition-all duration-500">
+            <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&q=80&w=1200" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 group-hover:scale-110 transition-all duration-700">
+            <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/60 to-transparent p-8 md:p-12 flex flex-col justify-center items-start">
+                <div class="bg-slate-800 p-3 rounded-xl mb-4">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                </div>
+                <h2 class="heading-font text-white text-2xl md:text-4xl font-black italic">ORDER LOGS</h2>
+                <p class="text-slate-400 text-xs font-bold mt-2 uppercase">Track merchandise & sales</p>
+            </div>
         </button>
     </div>
-</template>
-        
-        <div class="mb-12 text-center md:text-left">
-            <h1 class="heading-font text-white text-3xl md:text-5xl font-black mb-2 tracking-tighter uppercase italic">Admin Control Centre</h1>
-            <template x-if="getPendingCount() > 0">
-    <div @click="adminView = 'orders'; orderTab = 'pending'" 
-         class="mb-8 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-xl flex items-center justify-between cursor-pointer hover:bg-yellow-100 transition-all animate-pulse">
-        <div class="flex items-center gap-3">
-            <span class="text-2xl">⚠️</span>
-            <div>
-                <p class="text-[11px] font-black text-yellow-800 uppercase tracking-widest">Attention Required</p>
-                <p class="text-sm font-bold text-yellow-900" x-text="'There are ' + getPendingCount() + ' new orders waiting for confirmation!'"></p>
-            </div>
-        </div>
-        <span class="text-[10px] font-black bg-yellow-900 text-white px-3 py-1 rounded-full uppercase">Review Now</span>
-    </div>
-</template>
-            <p class="text-red-600 font-black text-xs tracking-[0.4em] uppercase">Select Management Module</p>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <button @click="adminView = 'users'" class="group relative aspect-[16/7] md:aspect-[16/6] overflow-hidden rounded-2xl bg-slate-900 border border-white/10 hover:border-red-600 transition-all duration-500">
-                <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=1200" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 group-hover:scale-110 transition-all duration-700">
-                <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/60 to-transparent p-8 md:p-12 flex flex-col justify-center items-start">
-                    <div class="bg-red-600 p-3 rounded-xl mb-4">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    </div>
-                    <h2 class="heading-font text-white text-2xl md:text-4xl font-black italic">USER REGISTRY</h2>
-                    <p class="text-slate-400 text-xs font-bold mt-2 uppercase">Manage community & permissions</p>
-                </div>
-            </button>
-            
-            <button @click="adminView = 'orders'" class="group relative aspect-[16/7] md:aspect-[16/6] overflow-hidden rounded-2xl bg-slate-900 border border-white/10 hover:border-red-600 transition-all duration-500">
-                <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&q=80&w=1200" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 group-hover:scale-110 transition-all duration-700">
-                <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/60 to-transparent p-8 md:p-12 flex flex-col justify-center items-start">
-                    <div class="bg-slate-800 p-3 rounded-xl mb-4">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                    </div>
-                    <h2 class="heading-font text-white text-2xl md:text-4xl font-black italic">ORDER LOGS</h2>
-                    <p class="text-slate-400 text-xs font-bold mt-2 uppercase">Track merchandise & sales</p>
-                </div>
-            </button>
-        </div>
 
-        <div class="mt-12 text-center">
-            <button @click="adminOpen = false" class="px-10 py-3 border border-white/20 text-white font-black uppercase tracking-[0.4em] text-[10px] hover:bg-white hover:text-black transition-all rounded-full">Exit Dashboard</button>
-        </div>
+    <div class="mt-12 text-center">
+        <button @click="adminOpen = false" class="px-10 py-3 border border-white/20 text-white font-black uppercase tracking-[0.4em] text-[10px] hover:bg-white hover:text-black transition-all rounded-full">Exit Dashboard</button>
     </div>
+</div>
 
      <!-- USER CONTROL PANEL -->
 <div x-show="adminView === 'users'" class="relative bg-white w-full max-w-5xl max-h-[85vh] rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl">
@@ -1720,19 +1715,22 @@ deleteUser(email) {
                 <div class="flex items-center gap-10 whitespace-nowrap">
                     <span class="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-900">Next Stop: MAEPS Serdang 2026</span>
                     <span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
-                    <span class="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-900">Proton X Perodua Gathering</span>
+                    <span class="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-900">Proton X Perodua Gathering 2026</span>
                     <span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
                     <span class="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-900">Official Merchandise Available</span>
                     <span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
+                   
                 </div>
+
                 <!-- Set 2 -->
                 <div class="flex items-center gap-10 whitespace-nowrap">
                     <span class="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-900">Next Stop: MAEPS Serdang 2026</span>
                     <span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
-                    <span class="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-900">Proton X Perodua Gathering</span>
+                    <span class="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-900">Proton X Perodua Gathering 2026</span>
                     <span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
                     <span class="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-900">Official Merchandise Available</span>
                     <span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
+                    
                 </div>
             </div>
         </div>
