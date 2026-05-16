@@ -458,6 +458,26 @@ removeAdmin(email) {
             }
         },
 
+        deliverOrder(orderId) {
+    const order = this.allOrders.find(o => o.id === orderId);
+    if(order) {
+        order.status = 'delivered';
+        localStorage.setItem('sh_all_orders', JSON.stringify(this.allOrders));
+        alert('Order ' + orderId + ' status updated to DELIVERED!');
+    }
+},
+
+cancelOrder(orderId) {
+    if(confirm('Adakah anda pasti mahu membatalkan pesanan ini?')) {
+        const order = this.allOrders.find(o => o.id === orderId);
+        if(order) {
+            order.status = 'cancelled';
+            localStorage.setItem('sh_all_orders', JSON.stringify(this.allOrders));
+            alert('Pesanan ' + orderId + ' telah berjaya dibatalkan.');
+        }
+    }
+},
+
         deleteOrder(orderId) {
             if(confirm('Remove this order log?')) {
                 this.allOrders = this.allOrders.filter(o => o.id !== orderId);
@@ -1118,6 +1138,8 @@ deleteUser(email) {
             <div class="flex bg-slate-200 p-1 rounded-xl">
                 <button @click="orderTab = 'pending'" :class="orderTab === 'pending' ? 'bg-red-600 text-white shadow-lg' : 'text-slate-500'" class="px-6 py-2 text-[10px] font-black uppercase rounded-lg transition-all">Incoming</button>
                 <button @click="orderTab = 'confirmed'" :class="orderTab === 'confirmed' ? 'bg-green-600 text-white shadow-lg' : 'text-slate-500'" class="px-6 py-2 text-[10px] font-black uppercase rounded-lg transition-all">Confirmed</button>
+                <button @click="orderTab = 'delivered'" :class="orderTab === 'delivered' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500'" class="px-4 py-2 text-[10px] font-black uppercase rounded-lg transition-all">Delivered</button>
+                <button @click="orderTab = 'cancelled'" :class="orderTab === 'cancelled' ? 'bg-gray-600 text-white shadow-lg' : 'text-slate-500'" class="px-4 py-2 text-[10px] font-black uppercase rounded-lg transition-all">Cancelled</button>
             </div>
         </div>
 
@@ -1150,7 +1172,32 @@ deleteUser(email) {
                                         <div class="text-[10px] font-bold text-slate-700" x-text="item.name + ' (x' + item.quantity + ')'"></div>
                                     </template>
                                 </div>
-                                <div class="text-red-600 font-black mt-2 italic text-sm" x-text="'RM ' + order.total"></div>
+                                <div class="text-red-600 font-black mt-2 italic text-sm" x-text="'RM ' + order.total">
+                                    <td class="py-4">
+    <!-- Paparan nama barangan dan jumlah harga -->
+    <template x-for="item in order.items">
+        <div class="font-bold" x-text="item.name + ' (x' + item.quantity + ')'"></div>
+    </template>
+    <div class="text-red-600 font-black mt-1" x-text="'RM ' + order.total"></div>
+
+    <!-- TAMPAL KOD BARU INI DI SINI -->
+    <div class="mt-4 p-3 bg-slate-100 rounded-xl border border-slate-200 text-left max-w-[200px]" x-show="order.status === 'confirmed'">
+        <label class="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em] block mb-1">
+            Update Tracking Number
+        </label>
+        <div class="flex gap-2">
+            <input type="text" 
+                   :value="order.tracking || ''" 
+                   @input="updateTracking(order.id, $event.target.value)"
+                   placeholder="Contoh: JNT1234..." 
+                   class="w-full px-3 py-1.5 text-[10px] font-bold bg-white border rounded-lg focus:border-red-600 outline-none transition-all shadow-sm">
+        </div>
+        <p class="text-[7px] text-slate-400 mt-1 font-medium italic">*Simpan automatik semasa ditaip.</p>
+    </div>
+    <!-- SEHINGGA SINI -->
+
+</td>
+                                </div>
                                 <div class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
     <label class="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">
         Update Tracking Number
@@ -1166,13 +1213,20 @@ deleteUser(email) {
 </div>
                             </td>
                             <td class="py-6 text-right align-top">
-                                <div class="flex flex-col gap-2 items-end">
-                                    <template x-if="order.status === 'pending'">
-                                        <button @click="confirmOrder(order.id)" class="px-4 py-1.5 bg-slate-900 text-white text-[9px] font-black uppercase rounded-lg hover:bg-green-600 transition-colors">Confirm</button>
-                                    </template>
-                                    <button @click="deleteOrder(order.id)" class="text-red-600 font-bold text-[10px] hover:underline uppercase">Delete</button>
-                                </div>
-                            </td>
+    <div class="flex flex-col gap-2 items-end">
+        <!-- Jika status pending, tunjuk butang Confirm -->
+        <template x-if="order.status === 'pending'">
+            <button @click="confirmOrder(order.id)" class="w-24 py-1.5 bg-slate-900 text-white text-[9px] font-black uppercase rounded-lg hover:bg-green-600 transition-colors">Confirm</button>
+        </template>
+        
+        <!-- BUTANG DELIVERED: Muncul jika status 'confirmed' (sudah di-confirm tapi belum dihantar) -->
+        <template x-if="order.status === 'confirmed'">
+            <button @click="deliverOrder(order.id)" class="w-24 py-1.5 bg-blue-600 text-white text-[9px] font-black uppercase rounded-lg hover:bg-blue-700 transition-colors">Delivered</button>
+        </template>
+        
+        <button @click="deleteOrder(order.id)" class="text-red-600 font-bold text-[10px] hover:underline uppercase mr-2">Delete</button>
+    </div>
+</td>
                         </tr>
                     </template>
                 </tbody>
@@ -1317,8 +1371,8 @@ deleteUser(email) {
                     <div class="group relative flex flex-col bg-slate-50 rounded-[2rem] border border-slate-100 overflow-hidden hover:shadow-2xl transition-all duration-500">
                         
                         <!-- Status Badge -->
-                        <div class="absolute top-4 right-4 z-10">
-                            <span :class="order.status === 'confirmed' ? 'bg-green-500' : 'bg-yellow-500'" 
+                  <div class="absolute top-4 right-4 z-10">
+                            <span :class="order.status === 'delivered' ? 'bg-blue-500' : (order.status === 'confirmed' ? 'bg-green-500' : (order.status === 'cancelled' ? 'bg-red-600' : 'bg-yellow-500'))"
                                   class="text-[8px] font-black text-white px-3 py-1 rounded-full uppercase tracking-widest shadow-lg"
                                   x-text="order.status"></span>
                         </div>
@@ -1369,13 +1423,22 @@ deleteUser(email) {
     </template>
 </div>
 
-                        <!-- Total Footer -->
+ <!-- Total Footer -->
                         <div class="p-6 bg-slate-100/50 flex justify-between items-center">
                             <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Paid</span>
                             <span class="text-lg font-black heading-font italic text-slate-900" x-text="'RM ' + order.total"></span>
                         </div>
                     </div>
-                </template>
+               
+
+                <!-- Butang Cancel Menggunakan x-show (Lebih Stabil & Selamat dari Template Blank) -->
+    <button x-show="order.status === 'pending'" 
+            @click="cancelOrder(order.id)" 
+            class="w-full bg-red-100 hover:bg-red-200 text-red-600 text-[10px] font-black uppercase py-2 rounded-xl transition-all tracking-widest text-center active:scale-95">
+        ✕ Batal Pesanan
+    </button>
+</div>
+</template>
 
                 <!-- Empty State -->
                 <template x-if="allOrders.filter(o => o.customer === checkoutForm.name).length === 0">
